@@ -6,6 +6,13 @@ app = Flask(__name__)
 
 STATE_FILE = "state.json"
 
+# ==========================================
+# CONFIGURATION: Set your question & answers
+# ==========================================
+SECURITY_QUESTION = "What is this guy's name??"
+# Store accepted answers in lowercase for easy matching (you can add multiple acceptable variants)
+ACCEPTED_ANSWERS = ["Lorentz", "lorentz"]
+
 # YOUR THREE MESSAGES
 MESSAGES = {
     "1": "This is Secret Message #1.",
@@ -20,7 +27,7 @@ def get_state():
                 return json.load(f)
         except Exception:
             pass
-    return {"chosen_option": None}
+    return {"chosen_option": None, "authenticated": False}
 
 def save_state(state):
     temp_file = STATE_FILE + ".tmp"
@@ -38,23 +45,17 @@ HTML_TEMPLATE = """
     <title>Choose Wisely</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* ==========================================================
-         * SAGE & SUNSET ORANGE THEME
-         * ========================================================== */
         :root {
-            --bg-color: #f4f6f4;          /* Soft, muted sage-tinted background */
-            --card-bg: #ffffff;           /* Clean white card */
-            --text-main: #2c3531;         /* Deep, soft charcoal text (not harsh black) */
-            --text-muted: #65746b;        /* Muted sage-grey for instructions */
-            
-            --accent-color: #e07a5f;      /* Sunset orange for primary actions */
-            --accent-hover: #cc6b50;      /* Slightly deeper sunset orange */
-            --accent-active: #81b29a;     /* Sage green highlight for the opened message */
-            
-            --locked-bg: #e2e8e4;         /* Soft neutral green-gray for locked buttons */
-            --locked-text: #94a39b;       /* Muted text for disabled buttons */
-            
-            --border-radius: 16px;        /* Softly rounded corners */
+            --bg-color: #f4f6f4;
+            --card-bg: #ffffff;
+            --text-main: #2c3531;
+            --text-muted: #65746b;
+            --accent-color: #e07a5f;
+            --accent-hover: #cc6b50;
+            --accent-active: #81b29a;
+            --locked-bg: #e2e8e4;
+            --locked-text: #94a39b;
+            --border-radius: 16px;
         }
 
         body {
@@ -94,11 +95,28 @@ HTML_TEMPLATE = """
             line-height: 1.6;
         }
 
-        .button-group {
+        .input-group, .button-group {
             margin-top: 25px;
             display: flex;
             flex-direction: column;
             gap: 12px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: calc(var(--border-radius) - 6px);
+            box-sizing: border-box;
+            background-color: #f8fafc;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-color);
         }
 
         button {
@@ -140,20 +158,34 @@ HTML_TEMPLATE = """
             border: 1px solid rgba(129, 178, 154, 0.15);
             border-left-width: 4px;
         }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>Choose One Message</h2>
-        <p id="status">Once you select a message, the server will permanently lock the other two for everyone.</p>
-        
-        <div class="button-group">
-            <button id="btn1" onclick="choose('1')">Message 1</button>
-            <button id="btn2" onclick="choose('2')">Message 2</button>
-            <button id="btn3" onclick="choose('3')">Message 3</button>
+        <h2>Choose Wisely</h2>
+
+        <!-- STEP 1: SECURITY QUESTION SECTION -->
+        <div id="auth-section">
+            <p id="question-label">{{ question }}</p>
+            <div class="input-group">
+                <input type="text" id="answer-input" placeholder="Enter your answer..." onkeypress="handleKeyPress(event)">
+                <button onclick="verifyAnswer()">Verify Answer</button>
+            </div>
+            <p id="error-msg" style="color: #e07a5f; font-size: 0.85rem; margin-top: 10px;" class="hidden">Incorrect answer. Try again.</p>
         </div>
 
-        <div id="result" style="display:none;"></div>
+        <!-- STEP 2: MESSAGE SELECTION SECTION (Initially Hidden) -->
+        <div id="choice-section" class="hidden">
+            <p id="status">Verified! Once you select a message, the server will permanently lock the other two.</p>
+            <div class="button-group">
+                <button id="btn1" onclick="choose('1')">Message 1</button>
+                <button id="btn2" onclick="choose('2')">Message 2</button>
+                <button id="btn3" onclick="choose('3')">Message 3</button>
+            </div>
+            <div id="result" class="hidden"></div>
+        </div>
     </div>
 
     <script>
@@ -161,11 +193,44 @@ HTML_TEMPLATE = """
             try {
                 let res = await fetch('/status?' + new Date().getTime());
                 let data = await res.json();
+                
                 if (data.chosen_option) {
+                    // Already chosen -> Skip question and show locked state directly
+                    document.getElementById('auth-section').classList.add('hidden');
+                    document.getElementById('choice-section').classList.remove('hidden');
                     applyLock(data.chosen_option, data.message);
+                } else if (data.authenticated) {
+                    // Already authenticated in this session -> Skip question
+                    document.getElementById('auth-section').classList.add('hidden');
+                    document.getElementById('choice-section').classList.remove('hidden');
                 }
             } catch (e) {
                 console.error(e);
+            }
+        }
+
+        async function verifyAnswer() {
+            let answer = document.getElementById('answer-input').value;
+            let res = await fetch('/verify', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ answer: answer })
+            });
+            let data = await res.json();
+
+            if (data.success) {
+                document.getElementById('auth-section').classList.add('hidden');
+                document.getElementById('choice-section').classList.remove('hidden');
+            } else {
+                let err = document.getElementById('error-msg');
+                err.classList.remove('hidden');
+                document.getElementById('answer-input').value = "";
+            }
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                verifyAnswer();
             }
         }
 
@@ -192,7 +257,7 @@ HTML_TEMPLATE = """
         }
 
         function applyLock(chosen, msg) {
-            document.querySelectorAll('button').forEach((b, index) => {
+            document.querySelectorAll('#choice-section button').forEach((b, index) => {
                 b.disabled = true;
                 if ((index + 1).toString() === chosen) {
                     b.style.backgroundColor = "var(--accent-active)";
@@ -204,7 +269,7 @@ HTML_TEMPLATE = """
 
             document.getElementById('status').innerText = "Choice permanently registered on server. Other options are locked.";
             let resBox = document.getElementById('result');
-            resBox.style.display = "block";
+            resBox.classList.remove('hidden');
             resBox.innerHTML = "<strong style='color: var(--accent-color);'>Message " + chosen + ":</strong><br><p style='margin-top:8px; color: var(--text-main);'>" + msg + "</p>";
         }
 
@@ -217,21 +282,38 @@ HTML_TEMPLATE = """
 
 @app.route('/')
 def home():
-    return render_template_string(HTML_TEMPLATE)
+    return render_template_string(HTML_TEMPLATE, question=SECURITY_QUESTION)
 
 @app.route('/status', methods=['GET'])
 def status():
     state = get_state()
     chosen = state.get("chosen_option")
+    authenticated = state.get("authenticated", False)
     if chosen:
-        return jsonify({"chosen_option": chosen, "message": MESSAGES[chosen]})
-    return jsonify({"chosen_option": None})
+        return jsonify({"chosen_option": chosen, "message": MESSAGES[chosen], "authenticated": True})
+    return jsonify({"chosen_option": None, "authenticated": authenticated})
+
+@app.route('/verify', methods=['POST'])
+def verify():
+    req_data = request.get_json()
+    user_answer = req_data.get("answer", "").strip().lower()
+    
+    if user_answer in ACCEPTED_ANSWERS:
+        state = get_state()
+        state["authenticated"] = True
+        save_state(state)
+        return jsonify({"success": True})
+    
+    return jsonify({"success": False}), 400
 
 @app.route('/choose', methods=['POST'])
 def choose():
     state = get_state()
+    if not state.get("authenticated", False):
+        return jsonify({"success": False, "error": "Not authenticated!"}), 403
+        
     if state.get("chosen_option") is not None:
-        return jsonify({"success": False, "error": "A choice has already been made and locked by someone else!"}), 400
+        return jsonify({"success": False, "error": "A choice has already been made and locked!"}), 400
     
     req_data = request.get_json()
     choice = str(req_data.get("choice"))
