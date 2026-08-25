@@ -39,22 +39,22 @@ HTML_TEMPLATE = """
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         /* ==========================================================
-         * THEME CUSTOMISATION: Edit colors, fonts, and spacing here
+         * SAGE & SUNSET ORANGE THEME
          * ========================================================== */
         :root {
-            --bg-color: #1D6142;          /* Main background color */
-            --card-bg: #F7702A;           /* Card background box */
-            --text-main: #f8fafc;         /* Primary text color */
-            --text-muted: #94a3b8;        /* Secondary/instruction text */
+            --bg-color: #f4f6f4;          /* Soft, muted sage-tinted background */
+            --card-bg: #ffffff;           /* Clean white card */
+            --text-main: #2c3531;         /* Deep, soft charcoal text (not harsh black) */
+            --text-muted: #65746b;        /* Muted sage-grey for instructions */
             
-            --accent-color: #0284c7;      /* Primary button color */
-            --accent-hover: #0369a1;      /* Button hover color */
-            --accent-active: #0369a1;     /* Selected/opened button color */
+            --accent-color: #e07a5f;      /* Sunset orange for primary actions */
+            --accent-hover: #cc6b50;      /* Slightly deeper sunset orange */
+            --accent-active: #81b29a;     /* Sage green highlight for the opened message */
             
-            --locked-bg: #334155;         /* Background for disabled/locked buttons */
-            --locked-text: #64748b;       /* Text color for disabled/locked buttons */
+            --locked-bg: #e2e8e4;         /* Soft neutral green-gray for locked buttons */
+            --locked-text: #94a39b;       /* Muted text for disabled buttons */
             
-            --border-radius: 12px;        /* Roundness of boxes and buttons */
+            --border-radius: 16px;        /* Softly rounded corners */
         }
 
         body {
@@ -73,23 +73,25 @@ HTML_TEMPLATE = """
 
         .card {
             background-color: var(--card-bg);
-            padding: 35px 30px;
+            padding: 40px 30px;
             border-radius: var(--border-radius);
             max-width: 420px;
             width: 100%;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(44, 53, 49, 0.06);
+            border: 1px solid rgba(129, 178, 154, 0.2);
         }
 
         h2 {
             margin-top: 0;
-            font-size: 1.5rem;
-            letter-spacing: -0.025em;
+            font-size: 1.6rem;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
         }
 
         p {
             color: var(--text-muted);
             font-size: 0.95rem;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .button-group {
@@ -106,10 +108,10 @@ HTML_TEMPLATE = """
             font-size: 1rem;
             font-weight: 600;
             border: none;
-            border-radius: calc(var(--border-radius) - 4px);
+            border-radius: calc(var(--border-radius) - 6px);
             cursor: pointer;
             background-color: var(--accent-color);
-            color: var(--text-main);
+            color: #ffffff;
             transition: background-color 0.2s, transform 0.1s;
         }
 
@@ -129,12 +131,14 @@ HTML_TEMPLATE = """
 
         #result {
             margin-top: 25px;
-            padding: 18px;
-            background-color: var(--bg-color);
-            border-left: 4px solid var(--accent-color);
-            border-radius: 6px;
+            padding: 20px;
+            background-color: #f7f9f7;
+            border-left: 4px solid var(--accent-active);
+            border-radius: 8px;
             text-align: left;
             word-break: break-word;
+            border: 1px solid rgba(129, 178, 154, 0.15);
+            border-left-width: 4px;
         }
     </style>
 </head>
