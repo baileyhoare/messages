@@ -23,7 +23,6 @@ def get_state():
     return {"chosen_option": None}
 
 def save_state(state):
-    # Write to a temp file first, then replace to prevent race conditions/corruption
     temp_file = STATE_FILE + ".tmp"
     with open(temp_file, "w") as f:
         json.dump(state, f)
@@ -33,26 +32,122 @@ def save_state(state):
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>One-Time Choice</title>
+    <meta charset="UTF-8">
+    <title>Choose Wisely</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: sans-serif; background: #0f172a; color: #fff; text-align: center; padding: 30px; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .card { background: #1e293b; padding: 30px; border-radius: 12px; max-width: 400px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        button { display: block; width: 100%; margin: 10px 0; padding: 12px; font-size: 16px; border: none; border-radius: 6px; cursor: pointer; background: #0284c7; color: white; font-weight: bold; transition: background 0.2s; }
-        button:hover:not(:disabled) { background: #0369a1; }
-        button:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
-        #result { margin-top: 20px; padding: 15px; background: #0f172a; border-left: 4px solid #38bdf8; text-align: left; word-break: break-word; }
+        /* ==========================================================
+         * THEME CUSTOMISATION: Edit colors, fonts, and spacing here
+         * ========================================================== */
+        :root {
+            --bg-color: #0f172a;          /* Main background color */
+            --card-bg: #1e293b;           /* Card background box */
+            --text-main: #f8fafc;         /* Primary text color */
+            --text-muted: #94a3b8;        /* Secondary/instruction text */
+            
+            --accent-color: #0284c7;      /* Primary button color */
+            --accent-hover: #0369a1;      /* Button hover color */
+            --accent-active: #0369a1;     /* Selected/opened button color */
+            
+            --locked-bg: #334155;         /* Background for disabled/locked buttons */
+            --locked-text: #64748b;       /* Text color for disabled/locked buttons */
+            
+            --border-radius: 12px;        /* Roundness of boxes and buttons */
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            padding: 35px 30px;
+            border-radius: var(--border-radius);
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .button-group {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: calc(var(--border-radius) - 4px);
+            cursor: pointer;
+            background-color: var(--accent-color);
+            color: var(--text-main);
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+        }
+
+        button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            background-color: var(--locked-bg);
+            color: var(--locked-text);
+            cursor: not-allowed;
+        }
+
+        #result {
+            margin-top: 25px;
+            padding: 18px;
+            background-color: var(--bg-color);
+            border-left: 4px solid var(--accent-color);
+            border-radius: 6px;
+            text-align: left;
+            word-break: break-word;
+        }
     </style>
 </head>
 <body>
     <div class="card">
         <h2>Choose One Message</h2>
         <p id="status">Once you select a message, the server will permanently lock the other two for everyone.</p>
-        <button id="btn1" onclick="choose('1')">Message 1</button>
-        <button id="btn2" onclick="choose('2')">Message 2</button>
-        <button id="btn3" onclick="choose('3')">Message 3</button>
+        
+        <div class="button-group">
+            <button id="btn1" onclick="choose('1')">Message 1</button>
+            <button id="btn2" onclick="choose('2')">Message 2</button>
+            <button id="btn3" onclick="choose('3')">Message 3</button>
+        </div>
 
         <div id="result" style="display:none;"></div>
     </div>
@@ -60,7 +155,7 @@ HTML_TEMPLATE = """
     <script>
         async function checkState() {
             try {
-                let res = await fetch('/status?' + new Date().getTime()); // prevent caching
+                let res = await fetch('/status?' + new Date().getTime());
                 let data = await res.json();
                 if (data.chosen_option) {
                     applyLock(data.chosen_option, data.message);
@@ -96,7 +191,7 @@ HTML_TEMPLATE = """
             document.querySelectorAll('button').forEach((b, index) => {
                 b.disabled = true;
                 if ((index + 1).toString() === chosen) {
-                    b.style.backgroundColor = "#0369a1";
+                    b.style.backgroundColor = "var(--accent-active)";
                     b.innerText = `Message ${chosen} (Opened)`;
                 } else {
                     b.innerText = `Message ${index + 1} (Locked)`;
@@ -106,10 +201,9 @@ HTML_TEMPLATE = """
             document.getElementById('status').innerText = "Choice permanently registered on server. Other options are locked.";
             let resBox = document.getElementById('result');
             resBox.style.display = "block";
-            resBox.innerHTML = "<strong style='color: #38bdf8;'>Message " + chosen + ":</strong><br><p style='margin-top:5px;'>" + msg + "</p>";
+            resBox.innerHTML = "<strong style='color: var(--accent-color);'>Message " + chosen + ":</strong><br><p style='margin-top:8px; color: var(--text-main);'>" + msg + "</p>";
         }
 
-        // Check state on load and poll every 3 seconds just in case
         checkState();
         setInterval(checkState, 3000);
     </script>
@@ -145,7 +239,6 @@ def choose():
     
     return jsonify({"success": False, "error": "Invalid choice"}), 400
 
-# Optional test reset route (remove before sending final link if you want)
 @app.route('/reset')
 def reset_state():
     if os.path.exists(STATE_FILE):
