@@ -42,8 +42,8 @@ HTML_TEMPLATE = """
          * THEME CUSTOMISATION: Edit colors, fonts, and spacing here
          * ========================================================== */
         :root {
-            --bg-color: #0f172a;          /* Main background color */
-            --card-bg: #1e293b;           /* Card background box */
+            --bg-color: #1D6142;          /* Main background color */
+            --card-bg: #F7702A;           /* Card background box */
             --text-main: #f8fafc;         /* Primary text color */
             --text-muted: #94a3b8;        /* Secondary/instruction text */
             
