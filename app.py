@@ -7,11 +7,17 @@ app = Flask(__name__)
 STATE_FILE = "state.json"
 
 # ==========================================
-# CONFIGURATION: Set your question & answers
+# CONFIGURATION
 # ==========================================
-SECURITY_QUESTION = "What is this guy's name??"
-# Store accepted answers in lowercase for easy matching (you can add multiple acceptable variants)
-ACCEPTED_ANSWERS = ["Lorentz", "lorentz"]
+SECURITY_QUESTION = "What is the name of our favorite cafe?"
+# Replace with your direct image URL, or leave as "" for text-only
+SECURITY_IMAGE_URL = "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&auto=format&fit=crop&q=60"
+
+ACCEPTED_ANSWERS = ["blue bottle", "the blue bottle", "bluebottle"]
+
+# Paste your Spotify Playlist embed link or ID here
+# Example format: "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0"
+SPOTIFY_EMBED_URL = "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0"
 
 # YOUR THREE MESSAGES
 MESSAGES = {
@@ -74,12 +80,13 @@ HTML_TEMPLATE = """
 
         .card {
             background-color: var(--card-bg);
-            padding: 40px 30px;
+            padding: 35px 30px;
             border-radius: var(--border-radius);
-            max-width: 420px;
+            max-width: 440px;
             width: 100%;
             box-shadow: 0 10px 30px rgba(44, 53, 49, 0.06);
             border: 1px solid rgba(129, 178, 154, 0.2);
+            box-sizing: border-box;
         }
 
         h2 {
@@ -95,8 +102,23 @@ HTML_TEMPLATE = """
             line-height: 1.6;
         }
 
+        .question-image {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: calc(var(--border-radius) - 8px);
+            margin-bottom: 15px;
+            border: 1px solid rgba(129, 178, 154, 0.2);
+        }
+
+        .spotify-container {
+            margin: 20px 0 15px 0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
         .input-group, .button-group {
-            margin-top: 25px;
+            margin-top: 20px;
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -166,19 +188,29 @@ HTML_TEMPLATE = """
     <div class="card">
         <h2>Choose Wisely</h2>
 
-        <!-- STEP 1: SECURITY QUESTION SECTION -->
+        <!-- STEP 1: SECURITY QUESTION SECTION WITH IMAGE -->
         <div id="auth-section">
+            {% if image_url %}
+            <img src="{{ image_url }}" alt="Security Question Hint" class="question-image">
+            {% endif %}
             <p id="question-label">{{ question }}</p>
             <div class="input-group">
                 <input type="text" id="answer-input" placeholder="Enter your answer..." onkeypress="handleKeyPress(event)">
                 <button onclick="verifyAnswer()">Verify Answer</button>
             </div>
-            <p id="error-msg" style="color: #e07a5f; font-size: 0.85rem; margin-top: 10px;" class="hidden">Incorrect answer. Try again.</p>
+            <p id="error-msg" style="color: var(--accent-color); font-size: 0.85rem; margin-top: 10px;" class="hidden">Incorrect answer. Try again.</p>
         </div>
 
         <!-- STEP 2: MESSAGE SELECTION SECTION (Initially Hidden) -->
         <div id="choice-section" class="hidden">
             <p id="status">Verified! Once you select a message, the server will permanently lock the other two.</p>
+            
+            {% if spotify_url %}
+            <div class="spotify-container">
+                <iframe style="border-radius:12px" src="{{ spotify_url }}" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+            </div>
+            {% endif %}
+
             <div class="button-group">
                 <button id="btn1" onclick="choose('1')">Message 1</button>
                 <button id="btn2" onclick="choose('2')">Message 2</button>
@@ -195,12 +227,10 @@ HTML_TEMPLATE = """
                 let data = await res.json();
                 
                 if (data.chosen_option) {
-                    // Already chosen -> Skip question and show locked state directly
                     document.getElementById('auth-section').classList.add('hidden');
                     document.getElementById('choice-section').classList.remove('hidden');
                     applyLock(data.chosen_option, data.message);
                 } else if (data.authenticated) {
-                    // Already authenticated in this session -> Skip question
                     document.getElementById('auth-section').classList.add('hidden');
                     document.getElementById('choice-section').classList.remove('hidden');
                 }
@@ -282,7 +312,7 @@ HTML_TEMPLATE = """
 
 @app.route('/')
 def home():
-    return render_template_string(HTML_TEMPLATE, question=SECURITY_QUESTION)
+    return render_template_string(HTML_TEMPLATE, question=SECURITY_QUESTION, image_url=SECURITY_IMAGE_URL, spotify_url=SPOTIFY_EMBED_URL)
 
 @app.route('/status', methods=['GET'])
 def status():
