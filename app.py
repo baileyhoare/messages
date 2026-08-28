@@ -22,20 +22,26 @@ SPOTIFY_EMBED_URL = "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYB
 # INTRO MESSAGE - shown as a scrollable popup right after the security question is passed
 INTRO_TITLE = "Hey Char"
 INTRO_MESSAGE = """
-I made a website for you. It took a while, but I knew I was going to wait until you had left Canada before sending it to you (which I think 
-has happened). You were always great at making fun websites for me. I had to build a dedicated front- and back-end because there are a couple
+
+I made a website. It took a while, but I knew I was going to wait until you had left Canada before sending it to you (which I think has 
+happened). You were always great at making fun websites for me. I had to build a dedicated front- and back-end because there are a couple
 of tricks which I will explain in a minute. Simply put, I wanted to reach out, with some of my thoughts over the last couple of months. I knew
 what I wanted to say, but not how to say it, and ended up drafting a couple of versions. I realised that it was because I had no gauge as to
-how you were doing, and didn't want to upset you, for why I couldn't get it right. So, I built this website, and you can choose. Each message
-is similar in content, but with a bit of a different tone, and places emphasis on different things.
+how you were doing, and didn't want to upset you or come across in the wrong way, for why I couldn't get the message quite right. So, I built
+this website, and you can choose. Each message is similar in content, but with a bit of a different tone, and places emphasis on different
+things. You will choose one message to read, and the other two will be locked away. As far as I know, there is no way to unlock the other two
+messages once you choose, so be careful.
 
 I thought about adding some fun easter eggs, but didn't want to overdo it. A nice colour scheme of sage green and sunset orange, along with
 the security question (well done on passing) should do it.
 
 There is no pressure to reply, but feel free to reach out.
 
-This website will automatically be taken down 24 hours after you make your choice. If you choose to respond, please take the time you need. I
-something I would want out on the internet forever. Obviously you will be able to copy/paste the message if you so desire, but 
+I really don't know how this will go down - it is quite daunting reaching out and being pretty vulnerable on here. All I know is that things
+ended so quickly, and I wanted to address a couple of things for good. Just to let you know, this website will automatically be taken down 24
+hours after you choose to open one of the messages. If you wish to respond, take whatever time you need. Obviously you can copy/paste the
+messages, and do whatever you like, but it would be nice to keep this between us if possible.
+
 """
 
 # YOUR THREE MESSAGES
