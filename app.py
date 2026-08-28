@@ -11,7 +11,7 @@ STATE_FILE = "state.json"
 # ==========================================
 SECURITY_QUESTION = "What is the name of our favorite cafe?"
 # Replace with your direct image URL, or leave as "" for text-only
-SECURITY_IMAGE_URL = ""/static/lorentz.jpg""
+SECURITY_IMAGE_URL = "/static/lorentz.jpg"
 
 ACCEPTED_ANSWERS = ["Lorentz", "lorentz"]
 
