@@ -11,7 +11,7 @@ STATE_FILE = "state.json"
 # ==========================================
 SECURITY_QUESTION = "What is the name of our favorite cafe?"
 # Replace with your direct image URL, or leave as "" for text-only
-SECURITY_IMAGE_URL = "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&auto=format&fit=crop&q=60"
+SECURITY_IMAGE_URL = ""/static/lorentz.jpg""
 
 ACCEPTED_ANSWERS = ["blue bottle", "the blue bottle", "bluebottle"]
 
