@@ -85,12 +85,6 @@ HTML_TEMPLATE = """
             --border-radius: 16px;
         }
 
-        @keyframes driftGradient {
-            0%   { background-position: 0% 50%; }
-            50%  { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             color: var(--text-main);
@@ -102,13 +96,24 @@ HTML_TEMPLATE = """
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+        }
 
-            background: linear-gradient(120deg, #f4f6f4, #e8efe9, #f6ece6, #f4f6f4);
-            background-size: 300% 300%;
-            animation: driftGradient 30s ease infinite;
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: 0;
         }
 
         .card {
+            position: relative;
+            z-index: 1;
             background-color: var(--card-bg);
             padding: 35px 30px;
             border-radius: var(--border-radius);
@@ -274,6 +279,8 @@ HTML_TEMPLATE = """
     </style>
 </head>
 <body>
+    <canvas id="particle-canvas"></canvas>
+
     <div class="card">
         <h2>Choose Wisely</h2>
 
@@ -333,6 +340,112 @@ HTML_TEMPLATE = """
     </div>
 
     <script>
+        // ---------- Interactive particle field ----------
+        (function() {
+            const canvas = document.getElementById('particle-canvas');
+            if (!canvas) { console.error('particle-canvas element not found'); return; }
+            const ctx = canvas.getContext('2d');
+            if (!ctx) { console.error('2D canvas context not available'); return; }
+            let width, height, particles;
+            const colors = ['#81b29a', '#e07a5f', '#a8c4b4', '#eba488'];
+            const mouse = { x: -9999, y: -9999, active: false };
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+
+            function initParticles() {
+                const count = Math.min(140, Math.floor((width * height) / 9000));
+                particles = [];
+                for (let i = 0; i < count; i++) {
+                    particles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * 0.4,
+                        vy: (Math.random() - 0.5) * 0.4,
+                        r: Math.random() * 2.5 + 2,
+                        color: colors[Math.floor(Math.random() * colors.length)]
+                    });
+                }
+            }
+
+            function step() {
+                ctx.clearRect(0, 0, width, height);
+
+                for (let p of particles) {
+                    // Gentle drift
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    // Wrap around edges
+                    if (p.x < -10) p.x = width + 10;
+                    if (p.x > width + 10) p.x = -10;
+                    if (p.y < -10) p.y = height + 10;
+                    if (p.y > height + 10) p.y = -10;
+
+                    // Mouse interaction: gently repel nearby particles
+                    if (mouse.active) {
+                        const dx = p.x - mouse.x;
+                        const dy = p.y - mouse.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        const radius = 130;
+                        if (dist < radius && dist > 0.01) {
+                            const force = (1 - dist / radius) * 1.8;
+                            p.x += (dx / dist) * force;
+                            p.y += (dy / dist) * force;
+                        }
+                    }
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = 0.8;
+                    ctx.fill();
+                }
+
+                // Draw connecting lines between nearby particles
+                ctx.globalAlpha = 1;
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const a = particles[i], b = particles[j];
+                        const dx = a.x - b.x, dy = a.y - b.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 130) {
+                            ctx.beginPath();
+                            ctx.moveTo(a.x, a.y);
+                            ctx.lineTo(b.x, b.y);
+                            ctx.strokeStyle = 'rgba(129, 178, 154, ' + (0.35 * (1 - dist / 130)) + ')';
+                            ctx.lineWidth = 1.2;
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                requestAnimationFrame(step);
+            }
+
+            window.addEventListener('resize', () => { resize(); initParticles(); });
+            window.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+                mouse.active = true;
+            });
+            window.addEventListener('mouseleave', () => { mouse.active = false; });
+            window.addEventListener('touchmove', (e) => {
+                if (e.touches.length > 0) {
+                    mouse.x = e.touches[0].clientX;
+                    mouse.y = e.touches[0].clientY;
+                    mouse.active = true;
+                }
+            }, { passive: true });
+            window.addEventListener('touchend', () => { mouse.active = false; });
+
+            resize();
+            initParticles();
+            step();
+        })();
+
         let introShown = false;
         let pendingChoice = null;
 
