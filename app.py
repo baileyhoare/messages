@@ -1,10 +1,36 @@
 from flask import Flask, render_template_string, jsonify, request
 import json
 import os
+import requests
 
 app = Flask(__name__)
 
 STATE_FILE = "state.json"
+
+# ==========================================
+# NOTIFICATIONS
+# ==========================================
+# Set to False when you're ready to send this to the real recipient.
+# While True, no notifications are sent - safe for testing.
+TESTING_MODE = True
+
+# A webhook URL that receives a POST with a JSON body like {"content": "..."}.
+# Easiest free option: https://ntfy.sh - pick a private topic name, e.g.
+#   NOTIFY_WEBHOOK_URL = "https://ntfy.sh/your-private-topic-name-here"
+# Discord and Slack "incoming webhook" URLs also work.
+NOTIFY_WEBHOOK_URL = ""
+
+def send_notification(message):
+    if TESTING_MODE or not NOTIFY_WEBHOOK_URL:
+        return
+    try:
+        if "ntfy.sh" in NOTIFY_WEBHOOK_URL:
+            requests.post(NOTIFY_WEBHOOK_URL, data=message.encode("utf-8"), timeout=5)
+        else:
+            # Discord/Slack-style webhook
+            requests.post(NOTIFY_WEBHOOK_URL, json={"content": message, "text": message}, timeout=5)
+    except Exception:
+        pass  # Never let a failed notification break the site
 
 # ==========================================
 # CONFIGURATION
@@ -170,6 +196,41 @@ HTML_TEMPLATE = """
             border-color: var(--accent-color);
         }
 
+        .envelope-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: calc(var(--border-radius) - 6px);
+            cursor: pointer;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .envelope-btn:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+        }
+
+        .envelope-btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .envelope-btn:disabled {
+            background-color: var(--locked-bg);
+            color: var(--locked-text);
+            cursor: not-allowed;
+        }
+
+        .envelope-btn svg {
+            flex-shrink: 0;
+        }
+
         button {
             display: block;
             width: 100%;
@@ -302,9 +363,30 @@ HTML_TEMPLATE = """
             <p id="status">Verified! Once you select a message, the server will permanently lock the other two.</p>
 
             <div class="button-group">
-                <button id="btn1" onclick="playClick(); requestChoice('1')">Message 1</button>
-                <button id="btn2" onclick="playClick(); requestChoice('2')">Message 2</button>
-                <button id="btn3" onclick="playClick(); requestChoice('3')">Message 3</button>
+                <button id="btn1" class="envelope-btn" onclick="playClick(); requestChoice('1')">
+                    <svg id="env-icon-1" width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="1" y="1" width="26" height="18" rx="2" stroke="white" stroke-width="1.5"/>
+                        <path d="M2 2L14 12L26 2" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="20" cy="6" r="2.5" fill="white"/>
+                    </svg>
+                    <span>Message 1</span>
+                </button>
+                <button id="btn2" class="envelope-btn" onclick="playClick(); requestChoice('2')">
+                    <svg id="env-icon-2" width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="1" y="1" width="26" height="18" rx="2" stroke="white" stroke-width="1.5"/>
+                        <path d="M2 2L14 12L26 2" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="20" cy="6" r="2.5" fill="white"/>
+                    </svg>
+                    <span>Message 2</span>
+                </button>
+                <button id="btn3" class="envelope-btn" onclick="playClick(); requestChoice('3')">
+                    <svg id="env-icon-3" width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="1" y="1" width="26" height="18" rx="2" stroke="white" stroke-width="1.5"/>
+                        <path d="M2 2L14 12L26 2" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="20" cy="6" r="2.5" fill="white"/>
+                    </svg>
+                    <span>Message 3</span>
+                </button>
             </div>
             <div id="result" class="hidden"></div>
         </div>
@@ -545,12 +627,25 @@ HTML_TEMPLATE = """
             const yesBtn = document.getElementById('confirm-yes-btn');
             yesBtn.disabled = true;
             document.getElementById('confirm-modal').classList.remove('hidden');
-            // Small delay before the confirm button becomes clickable - makes it deliberate
-            setTimeout(() => { yesBtn.disabled = false; }, 1500);
+
+            // 5 second countdown before the confirm button becomes clickable
+            let secondsLeft = 5;
+            yesBtn.innerText = `Yes, I'm sure (${secondsLeft})`;
+            const countdown = setInterval(() => {
+                secondsLeft -= 1;
+                if (secondsLeft > 0) {
+                    yesBtn.innerText = `Yes, I'm sure (${secondsLeft})`;
+                } else {
+                    clearInterval(countdown);
+                    yesBtn.innerText = "Yes, I'm sure";
+                    yesBtn.disabled = false;
+                }
+            }, 1000);
         }
 
         function cancelChoice() {
             pendingChoice = null;
+            document.getElementById('confirm-yes-btn').innerText = "Yes, I'm sure";
             document.getElementById('confirm-modal').classList.add('hidden');
         }
 
@@ -580,13 +675,29 @@ HTML_TEMPLATE = """
         }
 
         function applyLock(chosen, msg) {
-            document.querySelectorAll('#choice-section button').forEach((b, index) => {
+            document.querySelectorAll('#choice-section .envelope-btn').forEach((b, index) => {
                 b.disabled = true;
-                if ((index + 1).toString() === chosen) {
+                const num = index + 1;
+                const label = b.querySelector('span');
+                const icon = b.querySelector('svg');
+
+                if ((num).toString() === chosen) {
                     b.style.backgroundColor = "var(--accent-active)";
-                    b.innerText = `Message ${chosen} (Opened)`;
+                    label.textContent = `Message ${chosen} (Opened)`;
+                    // Open envelope icon: flap open, letter peeking out
+                    icon.innerHTML = `
+                        <path d="M2 6L14 14L26 6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        <rect x="6" y="1" width="16" height="12" rx="1" stroke="white" stroke-width="1.5" fill="none"/>
+                        <rect x="1" y="6" width="26" height="13" rx="2" stroke="white" stroke-width="1.5" fill="none"/>
+                    `;
                 } else {
-                    b.innerText = `Message ${index + 1} (Locked)`;
+                    label.textContent = `Message ${num} (Locked)`;
+                    // Sealed envelope with small lock dot
+                    icon.innerHTML = `
+                        <rect x="1" y="1" width="26" height="18" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                        <path d="M2 2L14 12L26 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        <circle cx="20" cy="6" r="2.5" fill="currentColor"/>
+                    `;
                 }
             });
 
@@ -605,6 +716,7 @@ HTML_TEMPLATE = """
 
 @app.route('/')
 def home():
+    send_notification("🔗 The link has been accessed.")
     return render_template_string(
         HTML_TEMPLATE,
         question=SECURITY_QUESTION,
@@ -650,6 +762,7 @@ def choose():
     if choice in MESSAGES:
         state["chosen_option"] = choice
         save_state(state)
+        send_notification(f"💌 A choice has been made: Message {choice} was opened.")
         return jsonify({"success": True, "message": MESSAGES[choice]})
     
     return jsonify({"success": False, "error": "Invalid choice"}), 400
