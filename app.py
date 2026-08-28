@@ -57,12 +57,21 @@ messages once you choose, so be careful.
 I thought about adding some fun easter eggs, but didn't want to overdo it. A nice colour scheme of sage green and sunset orange, along with
 the security question (well done on passing) should do it.
 
-There is no pressure to reply, but feel free to reach out.
+The first message is long, intellectual, and deeply reflective. Choose it if you want a deep apology, and true acceptance of where we went wrong.
+
+The second message is shorter and more emotionally vulnerable. Choose it if 
+
+The final message is a message of closure. Choose it if you are ready to move on.
+
+While I made the website as a fun way to get you this message, provide you agency, and not force you into a situation where you felt pressure
+to reply, I recognise this is not exactly 'fun', and you may have mixed emotions regarding everything. It is worth saying that I am completely
+at peace with the idea that you may not want to reply, and rest assured that I will not hassle you any further. It was bugging me greatly, 
+everything that was left unsaid, and we now have a way to remediate that issue.
 
 I really don't know how this will go down - it is quite daunting reaching out and being pretty vulnerable on here. All I know is that things
 ended so quickly, and I wanted to address a couple of things for good. Just to let you know, this website will automatically be taken down 24
 hours after you choose to open one of the messages. If you wish to respond, take whatever time you need. Obviously you can copy/paste the
-messages, and do whatever you like, but it would be nice to keep this between us if possible.
+messages, and do whatever you wish with what I have written, but it would be nice to keep this between us if possible.
 
 """
 
@@ -343,7 +352,7 @@ HTML_TEMPLATE = """
     <canvas id="particle-canvas"></canvas>
 
     <div class="card">
-        <h2>Choose Wisely</h2>
+        <h2>Security Check</h2>
 
         <!-- STEP 1: SECURITY QUESTION SECTION WITH IMAGE -->
         <div id="auth-section">
