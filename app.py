@@ -13,7 +13,7 @@ SECURITY_QUESTION = "What is the name of our favorite cafe?"
 # Replace with your direct image URL, or leave as "" for text-only
 SECURITY_IMAGE_URL = ""/static/lorentz.jpg""
 
-ACCEPTED_ANSWERS = ["blue bottle", "the blue bottle", "bluebottle"]
+ACCEPTED_ANSWERS = ["Lorentz", "lorentz"]
 
 # Paste your Spotify Playlist embed link or ID here
 # Example format: "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0"
