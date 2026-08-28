@@ -20,13 +20,22 @@ ACCEPTED_ANSWERS = ["Lorentz", "lorentz"]
 SPOTIFY_EMBED_URL = "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0"
 
 # INTRO MESSAGE - shown as a scrollable popup right after the security question is passed
-INTRO_TITLE = "Before you choose..."
+INTRO_TITLE = "Hey Char"
 INTRO_MESSAGE = """
-Write whatever you'd like the person to read here.
+I made a website for you. It took a while, but I knew I was going to wait until you had left Canada before sending it to you (which I think 
+has happened). You were always great at making fun websites for me. I had to build a dedicated front- and back-end because there are a couple
+of tricks which I will explain in a minute. Simply put, I wanted to reach out, with some of my thoughts over the last couple of months. I knew
+what I wanted to say, but not how to say it, and ended up drafting a couple of versions. I realised that it was because I had no gauge as to
+how you were doing, and didn't want to upset you, for why I couldn't get it right. So, I built this website, and you can choose. Each message
+is similar in content, but with a bit of a different tone, and places emphasis on different things.
 
-It can be as long as you want — this box scrolls, so
-feel free to write a few paragraphs. They'll need to
-click "I've read this" before they can pick a message.
+I thought about adding some fun easter eggs, but didn't want to overdo it. A nice colour scheme of sage green and sunset orange, along with
+the security question (well done on passing) should do it.
+
+There is no pressure to reply, but feel free to reach out.
+
+This website will automatically be taken down 24 hours after you make your choice. If you choose to respond, please take the time you need. I
+something I would want out on the internet forever. Obviously you will be able to copy/paste the message if you so desire, but 
 """
 
 # YOUR THREE MESSAGES
