@@ -271,17 +271,6 @@ HTML_TEMPLATE = """
             gap: 10px;
         }
 
-        .typewriter-cursor {
-            display: inline-block;
-            width: 2px;
-            background-color: var(--text-main);
-            margin-left: 1px;
-            animation: blink 0.9s step-start infinite;
-        }
-
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
     </style>
 </head>
 <body>
@@ -369,28 +358,12 @@ HTML_TEMPLATE = """
             }
         }
 
-        // ---------- Typewriter effect for intro only ----------
+        // ---------- Show intro text immediately (no typewriter) ----------
         function typewriteIntro() {
             const el = document.getElementById('intro-body');
             const btn = document.getElementById('intro-continue-btn');
-            const fullText = {{ intro_message|tojson }};
-            el.innerHTML = '<span id="tw-text"></span><span class="typewriter-cursor">&nbsp;</span>';
-            const textSpan = document.getElementById('tw-text');
-
-            let i = 0;
-            const speed = 18; // ms per character
-
-            function step() {
-                if (i < fullText.length) {
-                    textSpan.textContent += fullText.charAt(i);
-                    i++;
-                    el.scrollTop = el.scrollHeight;
-                    setTimeout(step, speed);
-                } else {
-                    btn.disabled = false;
-                }
-            }
-            step();
+            el.textContent = {{ intro_message|tojson }};
+            btn.disabled = false;
         }
 
         async function checkState() {
