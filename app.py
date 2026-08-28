@@ -19,6 +19,16 @@ ACCEPTED_ANSWERS = ["Lorentz", "lorentz"]
 # Example format: "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0"
 SPOTIFY_EMBED_URL = "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0"
 
+# INTRO MESSAGE - shown as a scrollable popup right after the security question is passed
+INTRO_TITLE = "Before you choose..."
+INTRO_MESSAGE = """
+Write whatever you'd like the person to read here.
+
+It can be as long as you want — this box scrolls, so
+feel free to write a few paragraphs. They'll need to
+click "I've read this" before they can pick a message.
+"""
+
 # YOUR THREE MESSAGES
 MESSAGES = {
     "1": "This is Secret Message #1.",
@@ -182,6 +192,57 @@ HTML_TEMPLATE = """
         }
 
         .hidden { display: none !important; }
+
+        /* ===== INTRO POPUP MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(44, 53, 49, 0.55);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-box {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            max-width: 440px;
+            width: 100%;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(44, 53, 49, 0.2);
+            border: 1px solid rgba(129, 178, 154, 0.2);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 25px 25px 10px 25px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+        }
+
+        .modal-body {
+            padding: 10px 25px;
+            overflow-y: auto;
+            text-align: left;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        .modal-footer {
+            padding: 15px 25px 25px 25px;
+        }
     </style>
 </head>
 <body>
@@ -220,7 +281,22 @@ HTML_TEMPLATE = """
         </div>
     </div>
 
+    <!-- INTRO POPUP: shown once, right after verification -->
+    <div id="intro-modal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>{{ intro_title }}</h2>
+            </div>
+            <div class="modal-body">{{ intro_message }}</div>
+            <div class="modal-footer">
+                <button onclick="closeIntro()">I've read this</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        let introShown = false;
+
         async function checkState() {
             try {
                 let res = await fetch('/status?' + new Date().getTime());
@@ -228,15 +304,30 @@ HTML_TEMPLATE = """
                 
                 if (data.chosen_option) {
                     document.getElementById('auth-section').classList.add('hidden');
+                    document.getElementById('intro-modal').classList.add('hidden');
                     document.getElementById('choice-section').classList.remove('hidden');
                     applyLock(data.chosen_option, data.message);
                 } else if (data.authenticated) {
                     document.getElementById('auth-section').classList.add('hidden');
-                    document.getElementById('choice-section').classList.remove('hidden');
+                    showIntroOrChoice();
                 }
             } catch (e) {
                 console.error(e);
             }
+        }
+
+        function showIntroOrChoice() {
+            if (!introShown) {
+                document.getElementById('intro-modal').classList.remove('hidden');
+            } else {
+                document.getElementById('choice-section').classList.remove('hidden');
+            }
+        }
+
+        function closeIntro() {
+            introShown = true;
+            document.getElementById('intro-modal').classList.add('hidden');
+            document.getElementById('choice-section').classList.remove('hidden');
         }
 
         async function verifyAnswer() {
@@ -250,7 +341,7 @@ HTML_TEMPLATE = """
 
             if (data.success) {
                 document.getElementById('auth-section').classList.add('hidden');
-                document.getElementById('choice-section').classList.remove('hidden');
+                showIntroOrChoice();
             } else {
                 let err = document.getElementById('error-msg');
                 err.classList.remove('hidden');
@@ -312,7 +403,14 @@ HTML_TEMPLATE = """
 
 @app.route('/')
 def home():
-    return render_template_string(HTML_TEMPLATE, question=SECURITY_QUESTION, image_url=SECURITY_IMAGE_URL, spotify_url=SPOTIFY_EMBED_URL)
+    return render_template_string(
+        HTML_TEMPLATE,
+        question=SECURITY_QUESTION,
+        image_url=SECURITY_IMAGE_URL,
+        spotify_url=SPOTIFY_EMBED_URL,
+        intro_title=INTRO_TITLE,
+        intro_message=INTRO_MESSAGE
+    )
 
 @app.route('/status', methods=['GET'])
 def status():
