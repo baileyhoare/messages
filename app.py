@@ -15,11 +15,7 @@ SECURITY_IMAGE_URL = "/static/lorentz.jpg"
 
 ACCEPTED_ANSWERS = ["Lorentz", "lorentz"]
 
-# Paste your Spotify Playlist embed link or ID here
-# Example format: "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0"
-SPOTIFY_EMBED_URL = "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0"
-
-# INTRO MESSAGE - shown as a scrollable popup right after the security question is passed
+# INTRO MESSAGE - shown as a scrollable, typewritten popup right after the security question is passed
 INTRO_TITLE = "Hey Char"
 INTRO_MESSAGE = """
 
@@ -89,9 +85,14 @@ HTML_TEMPLATE = """
             --border-radius: 16px;
         }
 
+        @keyframes driftGradient {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
             color: var(--text-main);
             text-align: center;
             padding: 20px;
@@ -101,6 +102,10 @@ HTML_TEMPLATE = """
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
+
+            background: linear-gradient(120deg, #f4f6f4, #e8efe9, #f6ece6, #f4f6f4);
+            background-size: 300% 300%;
+            animation: driftGradient 30s ease infinite;
         }
 
         .card {
@@ -134,12 +139,6 @@ HTML_TEMPLATE = """
             border-radius: calc(var(--border-radius) - 8px);
             margin-bottom: 15px;
             border: 1px solid rgba(129, 178, 154, 0.2);
-        }
-
-        .spotify-container {
-            margin: 20px 0 15px 0;
-            border-radius: 12px;
-            overflow: hidden;
         }
 
         .input-group, .button-group {
@@ -194,6 +193,16 @@ HTML_TEMPLATE = """
             cursor: not-allowed;
         }
 
+        button.secondary {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid #cbd5e1;
+        }
+
+        button.secondary:hover:not(:disabled) {
+            background-color: #f1f5f2;
+        }
+
         #result {
             margin-top: 25px;
             padding: 20px;
@@ -208,7 +217,7 @@ HTML_TEMPLATE = """
 
         .hidden { display: none !important; }
 
-        /* ===== INTRO POPUP MODAL ===== */
+        /* ===== MODAL (shared by intro + confirmation) ===== */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -257,6 +266,21 @@ HTML_TEMPLATE = """
 
         .modal-footer {
             padding: 15px 25px 25px 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .typewriter-cursor {
+            display: inline-block;
+            width: 2px;
+            background-color: var(--text-main);
+            margin-left: 1px;
+            animation: blink 0.9s step-start infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
         }
     </style>
 </head>
@@ -272,7 +296,7 @@ HTML_TEMPLATE = """
             <p id="question-label">{{ question }}</p>
             <div class="input-group">
                 <input type="text" id="answer-input" placeholder="Enter your answer..." onkeypress="handleKeyPress(event)">
-                <button onclick="verifyAnswer()">Verify Answer</button>
+                <button onclick="playClick(); verifyAnswer()">Verify Answer</button>
             </div>
             <p id="error-msg" style="color: var(--accent-color); font-size: 0.85rem; margin-top: 10px;" class="hidden">Incorrect answer. Try again.</p>
         </div>
@@ -280,37 +304,94 @@ HTML_TEMPLATE = """
         <!-- STEP 2: MESSAGE SELECTION SECTION (Initially Hidden) -->
         <div id="choice-section" class="hidden">
             <p id="status">Verified! Once you select a message, the server will permanently lock the other two.</p>
-            
-            {% if spotify_url %}
-            <div class="spotify-container">
-                <iframe style="border-radius:12px" src="{{ spotify_url }}" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-            </div>
-            {% endif %}
 
             <div class="button-group">
-                <button id="btn1" onclick="choose('1')">Message 1</button>
-                <button id="btn2" onclick="choose('2')">Message 2</button>
-                <button id="btn3" onclick="choose('3')">Message 3</button>
+                <button id="btn1" onclick="playClick(); requestChoice('1')">Message 1</button>
+                <button id="btn2" onclick="playClick(); requestChoice('2')">Message 2</button>
+                <button id="btn3" onclick="playClick(); requestChoice('3')">Message 3</button>
             </div>
             <div id="result" class="hidden"></div>
         </div>
     </div>
 
-    <!-- INTRO POPUP: shown once, right after verification -->
+    <!-- INTRO POPUP: shown once, right after verification. Typewriter effect. -->
     <div id="intro-modal" class="modal-overlay hidden">
         <div class="modal-box">
             <div class="modal-header">
                 <h2>{{ intro_title }}</h2>
             </div>
-            <div class="modal-body">{{ intro_message }}</div>
+            <div class="modal-body" id="intro-body"></div>
             <div class="modal-footer">
-                <button onclick="closeIntro()">I've read this</button>
+                <button id="intro-continue-btn" onclick="playClick(); closeIntro()" disabled>I've read this</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIRMATION RITUAL: replaces the default browser confirm() -->
+    <div id="confirm-modal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>Are you sure?</h2>
+            </div>
+            <div class="modal-body">
+                <p style="margin:0;">Once you choose, the other two messages lock forever. There's no way back from here.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="confirm-yes-btn" onclick="playClick(); confirmChoice()" disabled>Yes, I'm sure</button>
+                <button class="secondary" onclick="playClick(); cancelChoice()">Wait, not yet</button>
             </div>
         </div>
     </div>
 
     <script>
         let introShown = false;
+        let pendingChoice = null;
+
+        // ---------- Sound effect (Web Audio API, no external file needed) ----------
+        let audioCtx = null;
+        function playClick() {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(520, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(280, audioCtx.currentTime + 0.09);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+                osc.connect(gain).connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.12);
+            } catch (e) {
+                // Audio not available - fail silently
+            }
+        }
+
+        // ---------- Typewriter effect for intro only ----------
+        function typewriteIntro() {
+            const el = document.getElementById('intro-body');
+            const btn = document.getElementById('intro-continue-btn');
+            const fullText = {{ intro_message|tojson }};
+            el.innerHTML = '<span id="tw-text"></span><span class="typewriter-cursor">&nbsp;</span>';
+            const textSpan = document.getElementById('tw-text');
+
+            let i = 0;
+            const speed = 18; // ms per character
+
+            function step() {
+                if (i < fullText.length) {
+                    textSpan.textContent += fullText.charAt(i);
+                    i++;
+                    el.scrollTop = el.scrollHeight;
+                    setTimeout(step, speed);
+                } else {
+                    btn.disabled = false;
+                }
+            }
+            step();
+        }
 
         async function checkState() {
             try {
@@ -320,6 +401,7 @@ HTML_TEMPLATE = """
                 if (data.chosen_option) {
                     document.getElementById('auth-section').classList.add('hidden');
                     document.getElementById('intro-modal').classList.add('hidden');
+                    document.getElementById('confirm-modal').classList.add('hidden');
                     document.getElementById('choice-section').classList.remove('hidden');
                     applyLock(data.chosen_option, data.message);
                 } else if (data.authenticated) {
@@ -334,6 +416,7 @@ HTML_TEMPLATE = """
         function showIntroOrChoice() {
             if (!introShown) {
                 document.getElementById('intro-modal').classList.remove('hidden');
+                typewriteIntro();
             } else {
                 document.getElementById('choice-section').classList.remove('hidden');
             }
@@ -370,9 +453,26 @@ HTML_TEMPLATE = """
             }
         }
 
-        async function choose(option) {
-            if (!confirm("Are you sure? Once chosen, the other two messages will lock forever.")) return;
-            
+        // ---------- Confirmation ritual (replaces browser confirm()) ----------
+        function requestChoice(option) {
+            pendingChoice = option;
+            const yesBtn = document.getElementById('confirm-yes-btn');
+            yesBtn.disabled = true;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+            // Small delay before the confirm button becomes clickable - makes it deliberate
+            setTimeout(() => { yesBtn.disabled = false; }, 1500);
+        }
+
+        function cancelChoice() {
+            pendingChoice = null;
+            document.getElementById('confirm-modal').classList.add('hidden');
+        }
+
+        async function confirmChoice() {
+            if (!pendingChoice) return;
+            const option = pendingChoice;
+            document.getElementById('confirm-modal').classList.add('hidden');
+
             try {
                 let res = await fetch('/choose', {
                     method: 'POST',
@@ -390,6 +490,7 @@ HTML_TEMPLATE = """
                 alert("Network error. Please try again.");
                 checkState();
             }
+            pendingChoice = null;
         }
 
         function applyLock(chosen, msg) {
@@ -422,7 +523,6 @@ def home():
         HTML_TEMPLATE,
         question=SECURITY_QUESTION,
         image_url=SECURITY_IMAGE_URL,
-        spotify_url=SPOTIFY_EMBED_URL,
         intro_title=INTRO_TITLE,
         intro_message=INTRO_MESSAGE
     )
