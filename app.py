@@ -57,22 +57,23 @@ messages once you choose, so be careful.
 I thought about adding some fun easter eggs, but didn't want to overdo it. A nice colour scheme of sage green and sunset orange, along with
 the security question (well done on passing) should do it.
 
-The first message is long, intellectual, and deeply reflective. Choose it if you want a deep apology, and true acceptance of where we went wrong.
-
-The second message is shorter and more emotionally vulnerable. Choose it if 
-
-The final message is a message of closure. Choose it if you are ready to move on.
-
-While I made the website as a fun way to get you this message, provide you agency, and not force you into a situation where you felt pressure
-to reply, I recognise this is not exactly 'fun', and you may have mixed emotions regarding everything. It is worth saying that I am completely
-at peace with the idea that you may not want to reply, and rest assured that I will not hassle you any further. It was bugging me greatly, 
-everything that was left unsaid, and we now have a way to remediate that issue.
+There is no pressure to reply, but feel free to reach out.
 
 I really don't know how this will go down - it is quite daunting reaching out and being pretty vulnerable on here. All I know is that things
 ended so quickly, and I wanted to address a couple of things for good. Just to let you know, this website will automatically be taken down 24
 hours after you choose to open one of the messages. If you wish to respond, take whatever time you need. Obviously you can copy/paste the
-messages, and do whatever you wish with what I have written, but it would be nice to keep this between us if possible.
+messages, and do whatever you like, but it would be nice to keep this between us if possible.
 
+"""
+
+# "I can't choose" popup - extra context shown on request, doesn't affect the choice
+INDECISION_TITLE = "Not sure?"
+INDECISION_MESSAGE = """
+That's okay. Here's a bit more context to help:
+
+(Add whatever extra detail would actually help her decide here -
+what's different about the three, or reassurance that there's no
+wrong choice.)
 """
 
 # YOUR THREE MESSAGES
@@ -352,7 +353,7 @@ HTML_TEMPLATE = """
     <canvas id="particle-canvas"></canvas>
 
     <div class="card">
-        <h2>Security Check</h2>
+        <h2>Choose Wisely</h2>
 
         <!-- STEP 1: SECURITY QUESTION SECTION WITH IMAGE -->
         <div id="auth-section">
@@ -397,6 +398,8 @@ HTML_TEMPLATE = """
                     <span>Message 3</span>
                 </button>
             </div>
+
+            <button id="indecision-btn" class="secondary" style="margin-top: 12px;" onclick="playClick(); showIndecision()">I can't choose</button>
             <div id="result" class="hidden"></div>
         </div>
     </div>
@@ -426,6 +429,19 @@ HTML_TEMPLATE = """
             <div class="modal-footer">
                 <button id="confirm-yes-btn" onclick="playClick(); confirmChoice()" disabled>Yes, I'm sure</button>
                 <button class="secondary" onclick="playClick(); cancelChoice()">Wait, not yet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- INDECISION POPUP: extra context, doesn't affect state -->
+    <div id="indecision-modal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>{{ indecision_title }}</h2>
+            </div>
+            <div class="modal-body" style="white-space: pre-wrap;">{{ indecision_message }}</div>
+            <div class="modal-footer">
+                <button onclick="playClick(); closeIndecision()">Okay</button>
             </div>
         </div>
     </div>
@@ -579,6 +595,7 @@ HTML_TEMPLATE = """
                     document.getElementById('auth-section').classList.add('hidden');
                     document.getElementById('intro-modal').classList.add('hidden');
                     document.getElementById('confirm-modal').classList.add('hidden');
+                    document.getElementById('indecision-modal').classList.add('hidden');
                     document.getElementById('choice-section').classList.remove('hidden');
                     applyLock(data.chosen_option, data.message);
                 } else if (data.authenticated) {
@@ -603,6 +620,14 @@ HTML_TEMPLATE = """
             introShown = true;
             document.getElementById('intro-modal').classList.add('hidden');
             document.getElementById('choice-section').classList.remove('hidden');
+        }
+
+        function showIndecision() {
+            document.getElementById('indecision-modal').classList.remove('hidden');
+        }
+
+        function closeIndecision() {
+            document.getElementById('indecision-modal').classList.add('hidden');
         }
 
         async function verifyAnswer() {
@@ -684,6 +709,7 @@ HTML_TEMPLATE = """
         }
 
         function applyLock(chosen, msg) {
+            document.getElementById('indecision-btn').classList.add('hidden');
             document.querySelectorAll('#choice-section .envelope-btn').forEach((b, index) => {
                 b.disabled = true;
                 const num = index + 1;
@@ -731,7 +757,9 @@ def home():
         question=SECURITY_QUESTION,
         image_url=SECURITY_IMAGE_URL,
         intro_title=INTRO_TITLE,
-        intro_message=INTRO_MESSAGE
+        intro_message=INTRO_MESSAGE,
+        indecision_title=INDECISION_TITLE,
+        indecision_message=INDECISION_MESSAGE
     )
 
 @app.route('/status', methods=['GET'])
