@@ -9,7 +9,7 @@ STATE_FILE = "state.json"
 # ==========================================
 # CONFIGURATION
 # ==========================================
-SECURITY_QUESTION = "What is the name of our favorite cafe?"
+SECURITY_QUESTION = "What is this guy's name?"
 # Replace with your direct image URL, or leave as "" for text-only
 SECURITY_IMAGE_URL = "/static/lorentz.jpg"
 
@@ -48,7 +48,7 @@ HTML_TEMPLATE = """
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Choose Wisely</title>
+    <title>Security Question</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         :root {
