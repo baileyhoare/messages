@@ -274,7 +274,46 @@ There is plenty more I can say, and would like to share with you, but I will lea
     # ======================================
 
     "3": """
-PASTE YOUR CLOSURE MESSAGE HERE
+Hey Char,
+
+
+Firstly, I hope you are well. I really do. I hope you had an amazing time at home in Canada, as well as over your Summer break. It has been nice to watch along from a distance and see you enjoying yourself.
+
+I don’t know how this message will find you. It may be a terrible idea to contact you, and perhaps one that I should never have opted for. I recognise that perhaps it is too soon, and you would rather time and space. I understand you may be hurt after everything that happened. Equally, perhaps you are happier now, moving forward with life, and finding peace in the distance between us. I really hope the time with your friends and family have left you with a positive mindset and some special memories.
+
+I have tried my best - albeit with limited knowledge of your comings and goings - to time this message such that you will see it after you have left Canada. I do not want to interfere with the time you have with your family - something so special and important.
+
+I understand I was reasonably firm about not wanting to be in contact. In hindsight, I think that this has been beneficial for me. I have needed time to process what happened, and remove myself from the immediacy of everything. I have come to terms with what has happened with a clearer head. I hope, with however you have approached the last couple of months, you also have gained some additional clarity.
+
+I am not writing this message just to bug you, to interrupt your healing, or to elicit a response. I recognise you have no obligation to reply to me. I considered writing a physical letter, partly because I would not know when it had been received, and therefore it would place less immediate pressure on you to respond. In the end, I thought that the four or more weeks it may take for you to receive this, and potentially respond, may not be ideal in an ever-developing dynamic.
+
+I have had a lot of time to think over the last weeks, and have isolated myself to have time to genuinely reflect, rather than seek the opinions of others. So much of what unfolded is so specific to just us, with the history and context that developed over time, that nobody aside from you would ever truly understand my words anyway. My thoughts below are not an attempt to reopen every argument we ever had, but they are instead the thoughts that have stayed with me, and the thoughts that I have come to understand differently, with some reflection. While I recognise it may be unorthodox to send such a lengthy message after months of no contact, I would forever regret not letting you know a couple of things.
+
+I don’t really know how to start this, but I think the simplest thing I can say is that I miss you, and I miss what we had.
+
+I miss you in the ways that I knew I would, but also so much more. I miss your voice, and your laugh. I miss calling you, and seeing notifications from you. I miss your touch, and your smell. I miss sleepovers, and the ordinary things that never feel significant until they are gone. I miss listening to music in your kitchen, eating too much Zambreros, and walking Russell together at sunset.
+
+For so long, having you physically elsewhere was something I was learning to manage. It was difficult, and I hated the distance, but you were still my person.
+
+Not having you here was hard, but not having you at all is near-impossible.   You knew me better than anyone, and I never had to explain myself around you. Eventually, I took this for granted, and now there is a strange absence where you used to be.
+
+Life is okay. I am getting on with things. Being so very busy does help, but in the quiet times, at the end of the day, or on a Sunday afternoon, everything is quiet, and it's your voice I wish I could hear the most.
+
+I don’t want to make you feel guilty, or responsible for my happiness. You should just understand that losing you hasn’t been easy. You’ll feel as you read this, that this is a stripped back version of how we both used to feel, and its because while it is all true, it is difficult to be so vulnerable with someone I haven’t spoken to in so long. It is so tough carrying around years of memories and feelings regarding someone I no longer even speak to.
+
+I’ve thought a lot about why things ended, and I’ve thought even more about my part in it. I want you to know that I am sorry. I am sorry I wasn’t more supportive of your goals, and your aspirations. I understand that these goals took you further away from me, but that was never why you did it. I was just bitter about the distance, and frustrated by what it meant for us, that I was not able to properly celebrate what it meant for you. You deserved to have somebody that was completely proud of you.
+
+I understand I became complacent, and let frustration and resentment live where excitement and affection should have resided. I am also sorry that I didn’t tell you that you were loved enough. Part of me assumed you knew, part of me was frustrated, and saying it made the distance feel so much further. It’s not an excuse, I should have just told you, as you deserved to hear it.
+
+I don’t know exactly how I feel now, but I find myself looking at charporkspriv more often than I’d care to admit, and listening to music that makes me think of you (I saw you saved my playlist). It’s so difficult moving on, and I would be lying if I said there wasn’t at least a part of me that has wanted to reach out just to hear from you for a while now.
+
+That’s part of the reason why I’ve given you a choice in what you read. I could give you a tidy little goodbye, and move on, or I could break down why we went wrong, like I have in the other messages, but really, I know I miss you, at least a bit, so I might as well tell you.
+
+I’m really proud of you. You are a truly special person, and I am glad you were brave and chased what you wanted to achieve. It is inspiring, and I hope you know that you have always inspired me, ever since we met as kids.
+
+The point of this message is not to elicit a response from you, but to let you know that I miss you, and things aren’t easy. You don’t owe me anything: not an apology, not forgiveness, and not a response. Writing all three versions of these messages has helped me realise that I apologise for my role in our demise, verbalise how I feel, and move forward, regardless of how you feel in return.
+
+I hope you are happy, and continue to be happy. Keep being brave each day and go out and get what you want, I am sure you are destined for great things, both personally and professionally. You have always been capable of so much, and I hope you get the best out of life.
 
 P.S.
 
