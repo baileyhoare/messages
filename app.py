@@ -2283,24 +2283,19 @@ def status():
 )
 def verify():
 
-    req_data =
-        request.get_json(
-            silent=True
-        ) or {}
+    req_data = request.get_json(
+        silent=True
+    ) or {}
 
+    user_answer = req_data.get(
+        "answer",
+        ""
+    ).strip().lower()
 
-    user_answer =
-        req_data.get(
-            "answer",
-            ""
-        ).strip().lower()
-
-
-    accepted =
-        [
-            answer.lower()
-            for answer in ACCEPTED_ANSWERS
-        ]
+    accepted = [
+        answer.lower()
+        for answer in ACCEPTED_ANSWERS
+    ]
 
 
     if user_answer in accepted:
