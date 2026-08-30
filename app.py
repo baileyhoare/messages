@@ -23,7 +23,7 @@ TESTING_MODE = False
 # NOTIFY_WEBHOOK_URL = "https://ntfy.sh/your-private-topic"
 #
 # You can also use another webhook service.
-NOTIFY_WEBHOOK_URL = ""
+NOTIFY_WEBHOOK_URL = "https://ntfy.sh/bailey-char-messages-030621"
 
 
 def now_adelaide():
@@ -259,7 +259,7 @@ Hey Char,
 
 Firstly, I hope you are well. I really do. I hope you had an amazing time at home in Canada, as well as over your Summer break. It has been nice to watch along from a distance and see you enjoying yourself.
 
-I don’t know how this message will find you. It may be a terrible idea to contact you, and perhaps one that I should never have opted for. I recognise that perhaps it is too soon, and you would rather time and space. I understand you may be hurt after everything that happened. Equally, perhaps you are happier now, moving forward with life, and finding peace in the distance between us. I really hope the time with your friends and family have left you with a positive mindset and some special memories.
+I don't know how this message will find you. It may be a terrible idea to contact you, and perhaps one that I should never have opted for. I recognise that perhaps it is too soon, and you would rather time and space. I understand you may be hurt after everything that happened. Equally, perhaps you are happier now, moving forward with life, and finding peace in the distance between us. I really hope the time with your friends and family have left you with a positive mindset and some special memories.
 
 I have tried my best - albeit with limited knowledge of your comings and goings - to time this message such that you will see it after you have left Canada. I do not want to interfere with the time you have with your family - something so special and important.
 
@@ -269,7 +269,7 @@ I am not writing this message just to bug you, to interrupt your healing, or to 
 
 I have had a lot of time to think over the last weeks, and have isolated myself to have time to genuinely reflect, rather than seek the opinions of others. So much of what unfolded is so specific to just us, with the history and context that developed over time, that nobody aside from you would ever truly understand my words anyway. My thoughts below are not an attempt to reopen every argument we ever had, but they are instead the thoughts that have stayed with me, and the thoughts that I have come to understand differently, with some reflection. While I recognise it may be unorthodox to send such a lengthy message after months of no contact, I would forever regret not letting you know a couple of things.
 
-I don’t really know how to start this, but I think the simplest thing I can say is that I miss you, and I miss what we had.
+I don't really know how to start this, but I think the simplest thing I can say is that I miss you, and I miss what we had.
 
 I miss you in the ways that I knew I would, but also so much more. I miss your voice, and your laugh. I miss calling you, and seeing notifications from you. I miss your touch, and your smell. I miss sleepovers, and the ordinary things that never feel significant until they are gone. I miss listening to music in your kitchen, eating too much Zambreros, and walking Russell together at sunset.
 
@@ -279,21 +279,21 @@ Not having you here was hard, but not having you at all is near-impossible.
 
 You knew me better than anyone, and I never had to explain myself around you. Eventually, I took this for granted, and now there is a strange absence where you used to be.
 
-Life is okay. I am getting on with things. Being so very busy does help, but in the quiet times, at the end of the day, or on a Sunday afternoon, everything is quiet, and it’s your voice I wish I could hear the most.
+Life is okay. I am getting on with things. Being so very busy does help, but in the quiet times, at the end of the day, or on a Sunday afternoon, everything is quiet, and it's your voice I wish I could hear the most.
 
-I don’t want to make you feel guilty, or responsible for my happiness. You should just understand that losing you hasn’t been easy. You’ll feel as you read this, that this is a stripped back version of how we both used to feel, and it’s because while it is all true, it is difficult to be so vulnerable with someone I haven’t spoken to in so long. It is so tough carrying around years of memories and feelings regarding someone I no longer even speak to.
+I don't want to make you feel guilty, or responsible for my happiness. You should just understand that losing you hasn't been easy. You'll feel as you read this, that this is a stripped back version of how we both used to feel, and it's because while it is all true, it is difficult to be so vulnerable with someone I haven't spoken to in so long. It is so tough carrying around years of memories and feelings regarding someone I no longer even speak to.
 
-I’ve thought a lot about why things ended, and I’ve thought even more about my part in it. I want you to know that I am sorry. I am sorry I wasn’t more supportive of your goals, and your aspirations. I understand that these goals took you further away from me, but that was never why you did it. I was just bitter about the distance, and frustrated by what it meant for us, that I was not able to properly celebrate what it meant for you. You deserved to have somebody that was completely proud of you.
+I've thought a lot about why things ended, and I've thought even more about my part in it. I want you to know that I am sorry. I am sorry I wasn't more supportive of your goals, and your aspirations. I understand that these goals took you further away from me, but that was never why you did it. I was just bitter about the distance, and frustrated by what it meant for us, that I was not able to properly celebrate what it meant for you. You deserved to have somebody that was completely proud of you.
 
-I understand I became complacent, and let frustration and resentment live where excitement and affection should have resided. I am also sorry that I didn’t tell you that you were loved enough. Part of me assumed you knew, part of me was frustrated, and saying it made the distance feel so much further. It’s not an excuse, I should have just told you, as you deserved to hear it.
+I understand I became complacent, and let frustration and resentment live where excitement and affection should have resided. I am also sorry that I didn't tell you that you were loved enough. Part of me assumed you knew, part of me was frustrated, and saying it made the distance feel so much further. It's not an excuse, I should have just told you, as you deserved to hear it.
 
-I don’t know exactly how I feel now, but I find myself looking at charporkspriv more often than I’d care to admit, and listening to music that makes me think of you (I saw you saved my playlist). It’s so difficult moving on, and I would be lying if I said there wasn’t at least a part of me that has wanted to reach out just to hear from you for a while now.
+I don't know exactly how I feel now, but I find myself looking at charporkspriv more often than I'd care to admit, and listening to music that makes me think of you (I saw you saved my playlist). It's so difficult moving on, and I would be lying if I said there wasn't at least a part of me that has wanted to reach out just to hear from you for a while now.
 
-That’s part of the reason why I’ve given you a choice in what you read. I could give you a tidy little goodbye, and move on, or I could break down why we went wrong, like I have in the other messages, but really, I know I miss you, at least a bit, so I might as well tell you.
+That's part of the reason why I've given you a choice in what you read. I could give you a tidy little goodbye, and move on, or I could break down why we went wrong, like I have in the other messages, but really, I know I miss you, at least a bit, so I might as well tell you.
 
-I’m really proud of you. You are a truly special person, and I am glad you were brave and chased what you wanted to achieve. It is inspiring, and I hope you know that you have always inspired me, ever since we met as kids.
+I'm really proud of you. You are a truly special person, and I am glad you were brave and chased what you wanted to achieve. It is inspiring, and I hope you know that you have always inspired me, ever since we met as kids.
 
-The point of this message is not to elicit a response from you, but to let you know that I miss you, and things aren’t easy. You don’t owe me anything: not an apology, not forgiveness, and not a response. Writing all three versions of these messages has helped me realise that I apologise for my role in our demise, verbalise how I feel, and move on regardless of how you feel in return.
+The point of this message is not to elicit a response from you, but to let you know that I miss you, and things aren't easy. You don't owe me anything: not an apology, not forgiveness, and not a response. Writing all three versions of these messages has helped me realise that I apologise for my role in our demise, verbalise how I feel, and move on regardless of how you feel in return.
 
 I hope you are happy, and continue to be happy. Keep being brave each day and go out and get what you want, I am sure you are destined for great things, both personally and professionally. You have always been capable of so much, and I hope you get the best out of life.
 
@@ -307,7 +307,7 @@ https://www.instagram.com/reel/DcD8jwlkflb/
 
 https://www.instagram.com/p/DZA_VRbCXVN/
 
-There is plenty more I can say, and would like to share with you, but I will leave it there for now. This is just the bare-bones “if we were to never speak again, I would want her to know” explanation. If you have any thoughts, want me to elaborate, or just simply want to hear from me, let me know.
+There is plenty more I can say, and would like to share with you, but I will leave it there for now. This is just the bare-bones "if we were to never speak again, I would want her to know" explanation. If you have any thoughts, want me to elaborate, or just simply want to hear from me, let me know.
 """,
 
     "2": """
@@ -315,7 +315,7 @@ Hey Char,
 
 Firstly, I hope you are well. I really do. I hope you had a lovely time travelling, and also with your family. I think it is special that you got to see them again.
 
-I don’t know how this message will find you. It may be a terrible idea to contact you, and perhaps one that I should never have opted for. I recognise that perhaps it is too soon, and you would rather time and space. I understand you may be hurt after everything that happened. Equally, perhaps you are happier now, moving forward with life, and finding peace in the distance between us. I really hope the time with your friends and family have left you with a positive mindset and some special memories.
+I don't know how this message will find you. It may be a terrible idea to contact you, and perhaps one that I should never have opted for. I recognise that perhaps it is too soon, and you would rather time and space. I understand you may be hurt after everything that happened. Equally, perhaps you are happier now, moving forward with life, and finding peace in the distance between us. I really hope the time with your friends and family have left you with a positive mindset and some special memories.
 
 I have tried my best - albeit with limited knowledge of your comings and goings - to time this message such that you will see it after you have left Canada. I do not want to interfere with the time you have with your family - something so special and important.
 
@@ -339,9 +339,9 @@ I regret not speaking more earnestly with you about what I wanted us to become.
 
 For a long time, I convinced myself that we shared no goals, ideas, or aspirations. This was something that we had spoken about previously, particularly towards the beginning of this year. I believed we were moving in opposite directions, and not building together. I have thought a lot about this since.
 
-The truth is that I could never envision my life without you, but I never made it known to you. I believe the reason why I never thought we had a shared vision was accelerated by the fact that instead of asking you what you wanted your future to look like, I began to treat the absence of a clearly defined future as evidence that there couldn’t be one.
+The truth is that I could never envision my life without you, but I never made it known to you. I believe the reason why I never thought we had a shared vision was accelerated by the fact that instead of asking you what you wanted your future to look like, I began to treat the absence of a clearly defined future as evidence that there couldn't be one.
 
-I regret we did not discuss what you wanted your life to look like, and I regret not speaking honestly about what I wanted. We could have seen if these things could have coexisted. Perhaps they could, perhaps they could not. I don’t know.
+I regret we did not discuss what you wanted your life to look like, and I regret not speaking honestly about what I wanted. We could have seen if these things could have coexisted. Perhaps they could, perhaps they could not. I don't know.
 
 Past Issues
 
@@ -365,19 +365,19 @@ Future
 
 This is likely the other reason I have spent so much time and energy reflecting on us.
 
-In a few months, I will reach somewhat of a crossroads, in which, for the first time ever, I won’t be studying, and I have some decisions to make about what the next year(s) will look like. Until recently, I had been pretty set on taking a few months off, and maybe travelling around Australia or overseas before committing to anything long-term, whether it be employment or study.
+In a few months, I will reach somewhat of a crossroads, in which, for the first time ever, I won't be studying, and I have some decisions to make about what the next year(s) will look like. Until recently, I had been pretty set on taking a few months off, and maybe travelling around Australia or overseas before committing to anything long-term, whether it be employment or study.
 
 But, really, I always thought it would be you that I would spend this time with. Pertaining to my previous point, I had a rough vision for us, which I never really got to share with you, as you have been away so often. It gradually became something that seemed increasingly unlikely, and I eventually stopped imagining it. But now, with everything that has happened, I find myself wondering what it could have been like.
 
-I do not know what you plan to do once your internship ends. You have previously mentioned you may look to study, or even work, overseas. Maybe LEGO will want to keep you around. Perhaps you’ll come home and stay for a while. Maybe it’ll be something completely different, that both you and I couldn’t yet imagine. It is your life, and your decision, and I do not want this message to make you feel that you need to make any of those decisions with me in mind.
+I do not know what you plan to do once your internship ends. You have previously mentioned you may look to study, or even work, overseas. Maybe LEGO will want to keep you around. Perhaps you'll come home and stay for a while. Maybe it'll be something completely different, that both you and I couldn't yet imagine. It is your life, and your decision, and I do not want this message to make you feel that you need to make any of those decisions with me in mind.
 
-However, I want to be honest about something. If you do come home in a few months, and with enough time and distance from everything that has happened, you have developed your own thoughts and feelings, I don’t want to pretend that you couldn’t still be a part of this time.
+However, I want to be honest about something. If you do come home in a few months, and with enough time and distance from everything that has happened, you have developed your own thoughts and feelings, I don't want to pretend that you couldn't still be a part of this time.
 
-I don’t want a decision from you, or a promise, or for you to come back. I just want you to know that the door is not closed, should the right circumstances arise.
+I don't want a decision from you, or a promise, or for you to come back. I just want you to know that the door is not closed, should the right circumstances arise.
 
 Why I am sending this
 
-Our final conversations happened so quickly, and I have realised that I had left some things on the table, and some thoughts unsaid. I don’t want to spend any more time regretting not being clear with you.
+Our final conversations happened so quickly, and I have realised that I had left some things on the table, and some thoughts unsaid. I don't want to spend any more time regretting not being clear with you.
 
 I do not know how you will react to what I have said. You may be angry, hurt, or upset. Perhaps you have completely moved on. These are all okay, and you do not owe me anything. These are just my honest thoughts, which you deserve to know.
 
@@ -405,7 +405,7 @@ https://www.instagram.com/reel/DcD8jwlkflb/
 
 https://www.instagram.com/p/DZA_VRbCXVN/
 
-There is plenty more I can say, and would like to share with you, but I will leave it there for now. This is just the bare-bones “if we were to never speak again, I would want her to know” explanation. If you have any thoughts, want me to elaborate, or just simply want to hear from me, let me know.
+There is plenty more I can say, and would like to share with you, but I will leave it there for now. This is just the bare-bones "if we were to never speak again, I would want her to know" explanation. If you have any thoughts, want me to elaborate, or just simply want to hear from me, let me know.
 """,
 
     "3": """
@@ -413,7 +413,7 @@ Hey Char,
 
 Firstly, I hope you are well. I really do. I hope you had an amazing time at home in Canada, as well as over your Summer break. It has been nice to watch along from a distance and see you enjoying yourself.
 
-I don’t know how this message will find you. It may be a terrible idea to contact you, and perhaps one that I should never have opted for. I recognise that perhaps it is too soon, and you would rather time and space. I understand you may be hurt after everything that happened. Equally, perhaps you are happier now, moving forward with life, and finding peace in the distance between us. I really hope the time with your friends and family have left you with a positive mindset and some special memories.
+I don't know how this message will find you. It may be a terrible idea to contact you, and perhaps one that I should never have opted for. I recognise that perhaps it is too soon, and you would rather time and space. I understand you may be hurt after everything that happened. Equally, perhaps you are happier now, moving forward with life, and finding peace in the distance between us. I really hope the time with your friends and family have left you with a positive mindset and some special memories.
 
 I have tried my best - albeit with limited knowledge of your comings and goings - to time this message such that you will see it after you have left Canada. I do not want to interfere with the time you have with your family - something so special and important.
 
@@ -423,7 +423,7 @@ I am not writing this message just to bug you, to interrupt your healing, or to 
 
 I have had a lot of time to think over the last weeks, and have isolated myself to have time to genuinely reflect, rather than seek the opinions of others. So much of what unfolded is so specific to just us, with the history and context that developed over time, that nobody aside from you would ever truly understand my words anyway. My thoughts below are not an attempt to reopen every argument we ever had, but they are instead the thoughts that have stayed with me, and the thoughts that I have come to understand differently, with some reflection. While I recognise it may be unorthodox to send such a lengthy message after months of no contact, I would forever regret not letting you know a couple of things.
 
-I don’t really know how to start this, but I think the simplest thing I can say is that I miss you, and I miss what we had.
+I don't really know how to start this, but I think the simplest thing I can say is that I miss you, and I miss what we had.
 
 I miss you in the ways that I knew I would, but also so much more. I miss your voice, and your laugh. I miss calling you, and seeing notifications from you. I miss your touch, and your smell. I miss sleepovers, and the ordinary things that never feel significant until they are gone. I miss listening to music in your kitchen, eating too much Zambreros, and walking Russell together at sunset.
 
@@ -435,19 +435,19 @@ You knew me better than anyone, and I never had to explain myself around you. Ev
 
 Life is okay. I am getting on with things. Being so very busy does help, but in the quiet times, at the end of the day, or on a Sunday afternoon, everything is quiet, and it's your voice I wish I could hear the most.
 
-I don’t want to make you feel guilty, or responsible for my happiness. You should just understand that losing you hasn’t been easy. You’ll feel as you read this, that this is a stripped back version of how we both used to feel, and its because while it is all true, it is difficult to be so vulnerable with someone I haven’t spoken to in so long. It is so tough carrying around years of memories and feelings regarding someone I no longer even speak to.
+I don't want to make you feel guilty, or responsible for my happiness. You should just understand that losing you hasn't been easy. You'll feel as you read this, that this is a stripped back version of how we both used to feel, and its because while it is all true, it is difficult to be so vulnerable with someone I haven't spoken to in so long. It is so tough carrying around years of memories and feelings regarding someone I no longer even speak to.
 
-I’ve thought a lot about why things ended, and I’ve thought even more about my part in it. I want you to know that I am sorry. I am sorry I wasn’t more supportive of your goals, and your aspirations. I understand that these goals took you further away from me, but that was never why you did it. I was just bitter about the distance, and frustrated by what it meant for us, that I was not able to properly celebrate what it meant for you. You deserved to have somebody that was completely proud of you.
+I've thought a lot about why things ended, and I've thought even more about my part in it. I want you to know that I am sorry. I am sorry I wasn't more supportive of your goals, and your aspirations. I understand that these goals took you further away from me, but that was never why you did it. I was just bitter about the distance, and frustrated by what it meant for us, that I was not able to properly celebrate what it meant for you. You deserved to have somebody that was completely proud of you.
 
-I understand I became complacent, and let frustration and resentment live where excitement and affection should have resided. I am also sorry that I didn’t tell you that you were loved enough. Part of me assumed you knew, part of me was frustrated, and saying it made the distance feel so much further. It’s not an excuse, I should have just told you, as you deserved to hear it.
+I understand I became complacent, and let frustration and resentment live where excitement and affection should have resided. I am also sorry that I didn't tell you that you were loved enough. Part of me assumed you knew, part of me was frustrated, and saying it made the distance feel so much further. It's not an excuse, I should have just told you, as you deserved to hear it.
 
-I don’t know exactly how I feel now, but I find myself looking at charporkspriv more often than I’d care to admit, and listening to music that makes me think of you (I saw you saved my playlist). It’s so difficult moving on, and I would be lying if I said there wasn’t at least a part of me that has wanted to reach out just to hear from you for a while now.
+I don't know exactly how I feel now, but I find myself looking at charporkspriv more often than I'd care to admit, and listening to music that makes me think of you (I saw you saved my playlist). It's so difficult moving on, and I would be lying if I said there wasn't at least a part of me that has wanted to reach out just to hear from you for a while now.
 
-That’s part of the reason why I’ve given you a choice in what you read. I could give you a tidy little goodbye, and move on, or I could break down why we went wrong, like I have in the other messages, but really, I know I miss you, at least a bit, so I might as well tell you.
+That's part of the reason why I've given you a choice in what you read. I could give you a tidy little goodbye, and move on, or I could break down why we went wrong, like I have in the other messages, but really, I know I miss you, at least a bit, so I might as well tell you.
 
-I’m really proud of you. You are a truly special person, and I am glad you were brave and chased what you wanted to achieve. It is inspiring, and I hope you know that you have always inspired me, ever since we met as kids.
+I'm really proud of you. You are a truly special person, and I am glad you were brave and chased what you wanted to achieve. It is inspiring, and I hope you know that you have always inspired me, ever since we met as kids.
 
-The point of this message is not to elicit a response from you, but to let you know that I miss you, and things aren’t easy. You don’t owe me anything: not an apology, not forgiveness, and not a response. Writing all three versions of these messages has helped me realise that I apologise for my role in our demise, verbalise how I feel, and move forward, regardless of how you feel in return.
+The point of this message is not to elicit a response from you, but to let you know that I miss you, and things aren't easy. You don't owe me anything: not an apology, not forgiveness, and not a response. Writing all three versions of these messages has helped me realise that I apologise for my role in our demise, verbalise how I feel, and move forward, regardless of how you feel in return.
 
 I hope you are happy, and continue to be happy. Keep being brave each day and go out and get what you want, I am sure you are destined for great things, both personally and professionally. You have always been capable of so much, and I hope you get the best out of life.
 
@@ -461,7 +461,7 @@ https://www.instagram.com/reel/DcD8jwlkflb/
 
 https://www.instagram.com/p/DZA_VRbCXVN/
 
-There is plenty more I can say, and would like to share with you, but I will leave it there for now. This is just the bare-bones “if we were to never speak again, I would want her to know” explanation. If you have any thoughts, want me to elaborate, or just simply want to hear from me, let me know.
+There is plenty more I can say, and would like to share with you, but I will leave it there for now. This is just the bare-bones "if we were to never speak again, I would want her to know" explanation. If you have any thoughts, want me to elaborate, or just simply want to hear from me, let me know.
 """
 }
 
@@ -1042,7 +1042,7 @@ button.secondary:hover:not(:disabled) {
                 class="envelope-btn"
                 onclick="requestChoice('1')"
             >
-                <span>✉️</span>
+                <span>\u2709\ufe0f</span>
                 <span>Message 1</span>
             </button>
 
@@ -1052,7 +1052,7 @@ button.secondary:hover:not(:disabled) {
                 class="envelope-btn"
                 onclick="requestChoice('2')"
             >
-                <span>✉️</span>
+                <span>\u2709\ufe0f</span>
                 <span>Message 2</span>
             </button>
 
@@ -1062,7 +1062,7 @@ button.secondary:hover:not(:disabled) {
                 class="envelope-btn"
                 onclick="requestChoice('3')"
             >
-                <span>✉️</span>
+                <span>\u2709\ufe0f</span>
                 <span>Message 3</span>
             </button>
 
@@ -2137,14 +2137,6 @@ def home():
 
         state["first_visit_at"] = iso_time(current_time)
 
-    # NOTE:
-    # The line above intentionally needs to be written as:
-    #
-    # state["first_visit_at"] = iso_time(current_time)
-    #
-    # It is kept separate below to make the syntax unambiguous.
-
-
     state["first_visit_at"] = iso_time(
         first_visit
     )
@@ -2181,7 +2173,7 @@ def home():
     if visit_number == 1:
 
         visit_message = (
-            "🔗 CHAR MESSAGES — FIRST VISIT\n\n"
+            "\U0001F517 CHAR MESSAGES \u2014 FIRST VISIT\n\n"
             f"Time: {formatted_time(current_time)}\n"
             f"Visit number: {visit_number}\n\n"
             "The link has been opened for the first time."
@@ -2190,7 +2182,7 @@ def home():
     else:
 
         visit_message = (
-            "🔗 CHAR MESSAGES — LINK VISITED\n\n"
+            "\U0001F517 CHAR MESSAGES \u2014 LINK VISITED\n\n"
             f"Time: {formatted_time(current_time)}\n"
             f"Visit number: {visit_number}\n"
             f"Time since first visit: "
@@ -2300,8 +2292,7 @@ def verify():
 
     if user_answer in accepted:
 
-        state =
-            get_state()
+        state = get_state()
 
         state["authenticated"] = True
 
@@ -2328,8 +2319,7 @@ def verify():
 )
 def choose():
 
-    state =
-        get_state()
+    state = get_state()
 
 
     # --------------------------------------------------------
@@ -2369,19 +2359,17 @@ def choose():
         }), 400
 
 
-    req_data =
-        request.get_json(
-            silent=True
-        ) or {}
+    req_data = request.get_json(
+        silent=True
+    ) or {}
 
 
-    choice =
-        str(
-            req_data.get(
-                "choice",
-                ""
-            )
+    choice = str(
+        req_data.get(
+            "choice",
+            ""
         )
+    )
 
 
     # --------------------------------------------------------
@@ -2404,44 +2392,37 @@ def choose():
     # RECORD CHOICE
     # --------------------------------------------------------
 
-    current_time =
-        now_adelaide()
+    current_time = now_adelaide()
 
 
-    first_visit =
-        parse_time(
-            state.get(
-                "first_visit_at"
-            )
+    first_visit = parse_time(
+        state.get(
+            "first_visit_at"
         )
+    )
 
 
-    elapsed_text =
-        "unknown"
+    elapsed_text = "unknown"
 
 
     if first_visit:
 
-        elapsed_seconds =
-            (
-                current_time -
-                first_visit
-            ).total_seconds()
+        elapsed_seconds = (
+            current_time -
+            first_visit
+        ).total_seconds()
 
-        elapsed_text =
-            format_elapsed(
-                elapsed_seconds
-            )
-
-
-    state["chosen_option"] =
-        choice
-
-
-    state["chosen_at"] =
-        iso_time(
-            current_time
+        elapsed_text = format_elapsed(
+            elapsed_seconds
         )
+
+
+    state["chosen_option"] = choice
+
+
+    state["chosen_at"] = iso_time(
+        current_time
+    )
 
 
     save_state(state)
@@ -2451,16 +2432,15 @@ def choose():
     # CHOICE NOTIFICATION
     # --------------------------------------------------------
 
-    notification =
-        (
-            "💌 CHAR MESSAGES — CHOICE MADE\n\n"
-            f"Time: {formatted_time(current_time)}\n"
-            f"Message opened: {choice}\n"
-            f"Time since first visit: {elapsed_text}\n"
-            f"Total visits to link: "
-            f"{state.get('visit_count', 0)}\n\n"
-            "She has made her choice."
-        )
+    notification = (
+        "\U0001F48C CHAR MESSAGES \u2014 CHOICE MADE\n\n"
+        f"Time: {formatted_time(current_time)}\n"
+        f"Message opened: {choice}\n"
+        f"Time since first visit: {elapsed_text}\n"
+        f"Total visits to link: "
+        f"{state.get('visit_count', 0)}\n\n"
+        "She has made her choice."
+    )
 
 
     send_notification(
@@ -2507,13 +2487,12 @@ def reset_state():
 
 if __name__ == "__main__":
 
-    port =
-        int(
-            os.environ.get(
-                "PORT",
-                5000
-            )
+    port = int(
+        os.environ.get(
+            "PORT",
+            5000
         )
+    )
 
 
     app.run(
