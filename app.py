@@ -1,3 +1,4 @@
+```python
 from flask import Flask, render_template_string, jsonify, request
 import json
 import os
@@ -10,12 +11,12 @@ STATE_FILE = "state.json"
 # ==========================================
 # NOTIFICATIONS
 # ==========================================
+
 # Set to False when you're ready to send this to the real recipient.
 # While True, no notifications are sent - safe for testing.
 TESTING_MODE = True
 
 # A webhook URL that receives a POST with a JSON body like {"content": "..."}.
-# Easiest free option: https://ntfy.sh
 NOTIFY_WEBHOOK_URL = ""
 
 
@@ -31,7 +32,6 @@ def send_notification(message):
                 timeout=5
             )
         else:
-            # Discord/Slack-style webhook
             requests.post(
                 NOTIFY_WEBHOOK_URL,
                 json={
@@ -50,7 +50,6 @@ def send_notification(message):
 
 SECURITY_QUESTION = "What is this guy's name?"
 
-# Replace with your direct image URL, or leave as "" for text-only
 SECURITY_IMAGE_URL = "/static/lorentz.jpg"
 
 ACCEPTED_ANSWERS = [
@@ -66,23 +65,24 @@ ACCEPTED_ANSWERS = [
 INTRO_TITLE = "Hey Char"
 
 INTRO_MESSAGE = """
+
 I made a website. It took a while, but I knew I was going to wait until you had left Canada before sending it to you (which I think has happened). You were always great at making fun websites for me. I had to build a dedicated front- and back-end because there are a couple of tricks which I will explain in a minute.
 
 Simply put, I wanted to reach out, with some of my thoughts over the last couple of months. I knew what I wanted to say, but not how to say it, and ended up drafting a couple of versions. I realised that it was because I had no gauge as to how you were doing, and didn't want to upset you or come across in the wrong way, for why I couldn't get the message quite right.
 
 So, I built this website, and you can choose.
 
-Each message comes from the same place, but each one takes a slightly different approach:
+There are three messages. They all come from the same place, and they all contain some of the same things I have been thinking about, but each one has a different purpose and emphasis.
 
-Message 1 is the most personal. It is mainly about how I feel now — what I miss, what has been difficult, and the things I have wanted to tell you but haven't had the opportunity to say.
+Message 1 is the most personal. It is mainly about how I feel now: missing you, what I remember about us, what I regret, and the things I have found difficult since we stopped speaking. It is probably the most vulnerable of the three.
 
-Message 2 is more reflective. It is about looking back at what happened between us with a clearer head, understanding my own mistakes, and trying to make sense of why things ended the way they did. It also touches on things I wish I had handled differently and how I think about our future now.
+Message 2 is more reflective. It is less about simply telling you that I miss you, and more about trying to understand what happened between us. It talks about resentment, our future, my mistakes, the effect of the distance, and what I have come to understand after having some time to think.
 
-Message 3 is the closure version. It is less about trying to understand or change anything, and more about saying the things I would want you to know if we genuinely never spoke again. It is intended to leave things in a good place, acknowledge what I am sorry for, and wish you well.
+Message 3 is the closure version. It contains many of the same feelings as Message 1, but without trying to leave the door open in the same way. It is essentially the things I would want you to know if we never spoke again: what I am sorry for, what I appreciate about what we had, and what I hope for you going forward.
 
-There is some overlap between them, because they all come from the same person and the same history. But the emphasis is different.
+None of the three is intended to be the "right" choice. They are just three different ways of saying the things I have been carrying around, depending on what you feel most comfortable reading.
 
-You will choose one message to read, and the other two will be locked away. As far as I know, there is no way to unlock the other two messages once you choose, so be careful.
+Once you choose one, that is the only message you will be able to read. The other two will be permanently locked by the server, so there genuinely isn't a way for me to give you access to them afterwards. So, be careful.
 
 I thought about adding some fun easter eggs, but didn't want to overdo it. A nice colour scheme of sage green and sunset orange, along with the security question (well done on passing) should do it.
 
@@ -92,7 +92,8 @@ I really don't know how this will go down - it is quite daunting reaching out an
 
 Just to let you know, this website will automatically be taken down 24 hours after you choose to open one of the messages. If you wish to respond, take whatever time you need.
 
-Obviously you can copy/paste the messages, and do whatever you like, but it would be nice to keep this between us if possible.
+Obviously you can copy/paste the message, and do whatever you like, but it would be nice to keep this between us if possible.
+
 """
 
 
@@ -107,13 +108,13 @@ That's okay. Here's a bit more context to help:
 
 There isn't really a "right" choice.
 
-The three messages are similar in that they all come from the same place, but they focus on different things.
+Message 1 is the most emotional and personal. It is about how I feel now, how much I miss you, and the things I still find difficult about losing you.
 
-Message 1 is the most emotionally direct. It is about how I feel now, what I miss, and what I have wanted to say to you.
+Message 2 is the most analytical and reflective. It is about trying to understand why things went wrong, my role in that, what I regret, and what I have thought about our relationship since it ended.
 
-Message 2 is more about reflection. It looks back at what happened between us, my part in it, what I have come to understand with some distance, and what I regret.
+Message 3 is the closure message. It is about saying the things I would want you to know if we never spoke again, without asking anything of you in return.
 
-Message 3 is about closure. It is the simplest version of what I would want you to know if we never spoke again — acknowledging what happened, saying what I need to say, and leaving you with my best wishes.
+They overlap, but they are deliberately different in what they focus on.
 
 You will only get to read one, so choose whichever feels most appropriate to you.
 
@@ -320,7 +321,7 @@ You knew me better than anyone, and I never had to explain myself around you. Ev
 
 Life is okay. I am getting on with things. Being so very busy does help, but in the quiet times, at the end of the day, or on a Sunday afternoon, everything is quiet, and it's your voice I wish I could hear the most.
 
-I don’t want to make you feel guilty, or responsible for my happiness. You should just understand that losing you hasn’t been easy. You’ll feel as you read this, that this is a stripped back version of how we both used to feel, and it’s because while it is all true, it is difficult to be so vulnerable with someone I haven’t spoken to in so long. It is so tough carrying around years of memories and feelings regarding someone I no longer even speak to.
+I don’t want to make you feel guilty, or responsible for my happiness. You should just understand that losing you hasn’t been easy. You’ll feel as you read this, that this is a stripped back version of how we both used to feel, and its because while it is all true, it is difficult to be so vulnerable with someone I haven’t spoken to in so long. It is so tough carrying around years of memories and feelings regarding someone I no longer even speak to.
 
 I’ve thought a lot about why things ended, and I’ve thought even more about my part in it. I want you to know that I am sorry. I am sorry I wasn’t more supportive of your goals, and your aspirations. I understand that these goals took you further away from me, but that was never why you did it. I was just bitter about the distance, and frustrated by what it meant for us, that I was not able to properly celebrate what it meant for you. You deserved to have somebody that was completely proud of you.
 
@@ -356,10 +357,14 @@ There is plenty more I can say, and would like to share with you, but I will lea
 # ==========================================
 
 def get_state():
+
     if os.path.exists(STATE_FILE):
+
         try:
+
             with open(STATE_FILE, "r") as f:
                 return json.load(f)
+
         except Exception:
             pass
 
@@ -370,11 +375,15 @@ def get_state():
 
 
 def save_state(state):
+
     temp_file = STATE_FILE + ".tmp"
 
     with open(temp_file, "w") as f:
+
         json.dump(state, f)
+
         f.flush()
+
         os.fsync(f.fileno())
 
     os.replace(temp_file, STATE_FILE)
@@ -441,6 +450,8 @@ HTML_TEMPLATE = """
 
             min-height: 100vh;
 
+            box-sizing: border-box;
+
             background-color: var(--bg-color);
 
             position: relative;
@@ -464,8 +475,6 @@ HTML_TEMPLATE = """
             display: block;
 
             z-index: 0;
-
-            pointer-events: none;
         }
 
 
@@ -492,6 +501,7 @@ HTML_TEMPLATE = """
 
             border:
                 1px solid rgba(129, 178, 154, 0.2);
+
         }
 
 
@@ -708,12 +718,16 @@ HTML_TEMPLATE = """
 
 
         /*
-         * MESSAGE RESULT
+         * ==========================================
+         * MESSAGE RESULT / SCROLLING
+         * ==========================================
          *
-         * The important change here is that the message
-         * itself gets a fixed maximum height and its own
-         * vertical scrollbar. This means the page does
-         * not become enormous when a long message opens.
+         * The message itself gets a fixed maximum
+         * height and its own scrollbar.
+         *
+         * This means the page does not grow to the
+         * full length of the message, and the user
+         * can scroll through the message independently.
          */
 
         #result {
@@ -743,25 +757,22 @@ HTML_TEMPLATE = """
                 1px solid rgba(129, 178, 154, 0.15);
 
             /*
-             * Scrollable message area
+             * IMPORTANT:
+             * This creates the scrollable message area.
              */
-
             max-height: 60vh;
 
             overflow-y: auto;
 
             /*
-             * Makes scrolling feel better on iOS
+             * Keep the scrollbar behaviour smooth.
              */
-
-            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
 
             /*
-             * Prevents the browser from scrolling the
-             * page instead when interacting with the box.
+             * Make scrolling feel natural on iOS.
              */
-
-            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
         }
 
 
@@ -779,11 +790,29 @@ HTML_TEMPLATE = """
         }
 
 
-        #result strong {
+        #result::-webkit-scrollbar {
 
-            display: block;
+            width: 8px;
+        }
 
-            margin-bottom: 4px;
+
+        #result::-webkit-scrollbar-track {
+
+            background: transparent;
+        }
+
+
+        #result::-webkit-scrollbar-thumb {
+
+            background: rgba(101, 116, 107, 0.35);
+
+            border-radius: 10px;
+        }
+
+
+        #result::-webkit-scrollbar-thumb:hover {
+
+            background: rgba(101, 116, 107, 0.55);
         }
 
 
@@ -853,8 +882,6 @@ HTML_TEMPLATE = """
         .modal-header {
 
             padding: 25px 25px 10px 25px;
-
-            flex-shrink: 0;
         }
 
 
@@ -879,14 +906,6 @@ HTML_TEMPLATE = """
             line-height: 1.7;
 
             white-space: pre-wrap;
-
-            -webkit-overflow-scrolling: touch;
-        }
-
-
-        .modal-body p {
-
-            color: var(--text-main);
         }
 
 
@@ -900,8 +919,6 @@ HTML_TEMPLATE = """
             flex-direction: column;
 
             gap: 10px;
-
-            flex-shrink: 0;
         }
 
     </style>
@@ -987,7 +1004,6 @@ HTML_TEMPLATE = """
 
 
             <div class="button-group">
-
 
                 <!-- MESSAGE 1 -->
 
@@ -1193,7 +1209,6 @@ HTML_TEMPLATE = """
                 <button
                     id="intro-continue-btn"
                     onclick="playClick(); closeIntro()"
-                    disabled
                 >
                     I've read this
                 </button>
@@ -1317,9 +1332,6 @@ HTML_TEMPLATE = """
                 document.getElementById('particle-canvas');
 
             if (!canvas) {
-                console.error(
-                    'particle-canvas element not found'
-                );
                 return;
             }
 
@@ -1328,9 +1340,6 @@ HTML_TEMPLATE = """
                 canvas.getContext('2d');
 
             if (!ctx) {
-                console.error(
-                    '2D canvas context not available'
-                );
                 return;
             }
 
@@ -1670,6 +1679,18 @@ HTML_TEMPLATE = """
 
         let pendingChoice = null;
 
+        /*
+         * IMPORTANT:
+         * Remember which message has already been
+         * rendered in the browser.
+         *
+         * checkState() runs every few seconds.
+         * Without this variable, applyLock() would
+         * rebuild the message every time and reset
+         * the scrollbar to the top.
+         */
+        let renderedChoice = null;
+
 
         // ==========================================
         // SOUND EFFECT
@@ -1741,7 +1762,9 @@ HTML_TEMPLATE = """
                 );
 
             } catch (e) {
+
                 // Audio unavailable.
+
             }
 
         }
@@ -1909,10 +1932,6 @@ HTML_TEMPLATE = """
             } catch (e) {
 
                 console.error(e);
-
-                alert(
-                    "Something went wrong. Please try again."
-                );
 
             }
 
@@ -2102,6 +2121,28 @@ HTML_TEMPLATE = """
 
         function applyLock(chosen, msg) {
 
+            /*
+             * ======================================
+             * CRITICAL FIX
+             * ======================================
+             *
+             * checkState() runs every 3 seconds.
+             *
+             * If this function rebuilt #result every
+             * time, the scroll position was reset to
+             * zero every 3 seconds.
+             *
+             * We therefore only render the message
+             * if this particular choice has not
+             * already been rendered.
+             */
+
+            const alreadyRendered =
+                renderedChoice === chosen;
+
+
+            // Hide "I can't choose"
+
             document
                 .getElementById(
                     'indecision-btn'
@@ -2109,6 +2150,8 @@ HTML_TEMPLATE = """
                 .classList
                 .add('hidden');
 
+
+            // Lock all envelopes
 
             document
                 .querySelectorAll(
@@ -2136,7 +2179,9 @@ HTML_TEMPLATE = """
                             );
 
 
+                        // ==================================
                         // CHOSEN MESSAGE
+                        // ==================================
 
                         if (
                             num.toString() === chosen
@@ -2186,7 +2231,9 @@ HTML_TEMPLATE = """
                             `;
 
 
+                        // ==================================
                         // LOCKED MESSAGES
+                        // ==================================
 
                         } else {
 
@@ -2231,15 +2278,27 @@ HTML_TEMPLATE = """
                 );
 
 
+            // Update status
+
             document
                 .getElementById('status')
                 .innerText =
                 "Choice permanently registered on server. Other options are locked.";
 
 
-            // ==========================================
-            // DISPLAY MESSAGE
-            // ==========================================
+            /*
+             * ======================================
+             * ONLY BUILD THE MESSAGE ONCE
+             * ======================================
+             */
+
+            if (alreadyRendered) {
+                return;
+            }
+
+
+            renderedChoice = chosen;
+
 
             let resBox =
                 document.getElementById(
@@ -2252,8 +2311,12 @@ HTML_TEMPLATE = """
             );
 
 
+            // Clear existing content
+
             resBox.innerHTML = "";
 
+
+            // Message heading
 
             const heading =
                 document.createElement(
@@ -2268,6 +2331,8 @@ HTML_TEMPLATE = """
             heading.textContent =
                 "Message " + chosen + ":";
 
+
+            // Message body
 
             const message =
                 document.createElement(
@@ -2291,6 +2356,8 @@ HTML_TEMPLATE = """
                 msg;
 
 
+            // Put them into result box
+
             resBox.appendChild(
                 heading
             );
@@ -2298,11 +2365,6 @@ HTML_TEMPLATE = """
             resBox.appendChild(
                 message
             );
-
-
-            // Start at the top of the message
-
-            resBox.scrollTop = 0;
 
         }
 
@@ -2434,20 +2496,27 @@ def home():
         "🔗 The link has been accessed."
     )
 
+
     return render_template_string(
         HTML_TEMPLATE,
 
-        question=SECURITY_QUESTION,
+        question=
+            SECURITY_QUESTION,
 
-        image_url=SECURITY_IMAGE_URL,
+        image_url=
+            SECURITY_IMAGE_URL,
 
-        intro_title=INTRO_TITLE,
+        intro_title=
+            INTRO_TITLE,
 
-        intro_message=INTRO_MESSAGE,
+        intro_message=
+            INTRO_MESSAGE,
 
-        indecision_title=INDECISION_TITLE,
+        indecision_title=
+            INDECISION_TITLE,
 
-        indecision_message=INDECISION_MESSAGE
+        indecision_message=
+            INDECISION_MESSAGE
     )
 
 
@@ -2456,14 +2525,17 @@ def status():
 
     state = get_state()
 
+
     chosen = state.get(
         "chosen_option"
     )
+
 
     authenticated = state.get(
         "authenticated",
         False
     )
+
 
     if chosen:
 
@@ -2479,6 +2551,7 @@ def status():
                 True
 
         })
+
 
     return jsonify({
 
@@ -2496,9 +2569,6 @@ def verify():
 
     req_data = request.get_json()
 
-    if not req_data:
-        req_data = {}
-
 
     user_answer = req_data.get(
         "answer",
@@ -2513,9 +2583,12 @@ def verify():
 
         state = get_state()
 
+
         state["authenticated"] = True
 
+
         save_state(state)
+
 
         return jsonify({
             "success": True
@@ -2568,9 +2641,6 @@ def choose():
 
     req_data = request.get_json()
 
-    if not req_data:
-        req_data = {}
-
 
     choice = str(
         req_data.get(
@@ -2584,6 +2654,7 @@ def choose():
     if choice in MESSAGES:
 
         state["chosen_option"] = choice
+
 
         save_state(state)
 
@@ -2648,3 +2719,4 @@ if __name__ == '__main__':
         host="0.0.0.0",
         port=port
     )
+```
