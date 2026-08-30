@@ -200,7 +200,7 @@ Simply put, I wanted to reach out, with some of my thoughts over the last couple
 
 So, I built this website, and you can choose. I understand choosing is difficult, especially for you. Do not worry too much, the messages all say more or less the same thing, but each one has a different purpose and emphasis.
 
-Message 1 is the most personal. It is mainly about how I feel now: missing you, what I remember about us, what I regret, and the things I have found difficult since we stopped speaking. It is probably the most vulnerable of the three, and you should choose it if you have been sad, and have missed what we had.
+Message 1 is the most personal. It is mainly about how I feel now: missing you, what I remember about us, what I regret, and the things I have found difficult since we stopped speaking. It is probably the most vulnerable of the three, and you should choose it if you have been sad, and have missed what we had. If you're not interested in this, or have moved on, I would give this a miss.
 
 Message 2 is more reflective. It is less about simply telling you that I miss you, and more about trying to understand what happened between us. It talks about resentment, our future, my mistakes, the effect of the distance, and what I have come to understand after having some time to think. This contains the most depth, and also mentions what the next months look like for me. Choose this for a down-the-middle, in depth review.
 
