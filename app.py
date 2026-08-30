@@ -2,58 +2,227 @@ from flask import Flask, render_template_string, jsonify, request
 import json
 import os
 import requests
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 
 app = Flask(__name__)
 
+
 STATE_FILE = "state.json"
+
 
 # ==========================================
 # NOTIFICATIONS
 # ==========================================
 
-# Set to False when you're ready to send this to the real recipient.
-# While True, no notifications are sent - safe for testing.
-TESTING_MODE = True
+# ==========================================
+# IMPORTANT:
+#
+# False = notifications are ACTIVE.
+#
+# Set to True if you want to test the website
+# without receiving notifications.
+# ==========================================
 
-# A webhook URL that receives a POST with a JSON body like {"content": "..."}.
-NOTIFY_WEBHOOK_URL = ""
+TESTING_MODE = False
 
 
-def send_notification(message):
-    if TESTING_MODE or not NOTIFY_WEBHOOK_URL:
+# ==========================================
+# YOUR NTFY TOPIC
+#
+# Replace YOUR-RANDOM-TOPIC-HERE with the
+# private/random topic you created in ntfy.
+#
+# Example:
+#
+# https://ntfy.sh/bailey-char-7f92k4m8xq
+# ==========================================
+
+NOTIFY_WEBHOOK_URL = (
+    "https://ntfy.sh/bailey-char-messages-030621"
+)
+
+
+def get_adelaide_time():
+
+    return datetime.now(
+        ZoneInfo("Australia/Adelaide")
+    )
+
+
+def format_time(dt):
+
+    return dt.strftime(
+        "%A, %d %B %Y at %I:%M:%S %p"
+    )
+
+
+def format_duration(seconds):
+
+    seconds = int(seconds)
+
+    days, remainder = divmod(
+        seconds,
+        86400
+    )
+
+    hours, remainder = divmod(
+        remainder,
+        3600
+    )
+
+    minutes, seconds = divmod(
+        remainder,
+        60
+    )
+
+
+    parts = []
+
+
+    if days:
+        parts.append(
+            f"{days} day"
+            + ("s" if days != 1 else "")
+        )
+
+
+    if hours:
+        parts.append(
+            f"{hours} hour"
+            + ("s" if hours != 1 else "")
+        )
+
+
+    if minutes:
+        parts.append(
+            f"{minutes} minute"
+            + ("s" if minutes != 1 else "")
+        )
+
+
+    if seconds or not parts:
+
+        parts.append(
+            f"{seconds} second"
+            + ("s" if seconds != 1 else "")
+        )
+
+
+    return ", ".join(parts)
+
+
+def send_notification(
+    message,
+    title="Char Messages"
+):
+
+    """
+    Send a push notification through ntfy.
+
+    If TESTING_MODE is True, nothing is sent.
+    """
+
+    if (
+        TESTING_MODE
+        or not NOTIFY_WEBHOOK_URL
+    ):
         return
 
+
     try:
+
         if "ntfy.sh" in NOTIFY_WEBHOOK_URL:
-            requests.post(
+
+            response = requests.post(
+
                 NOTIFY_WEBHOOK_URL,
-                data=message.encode("utf-8"),
-                timeout=5
-            )
-        else:
-            requests.post(
-                NOTIFY_WEBHOOK_URL,
-                json={
-                    "content": message,
-                    "text": message
+
+                data=message.encode(
+                    "utf-8"
+                ),
+
+                headers={
+
+                    "Title":
+                        title,
+
+                    "Priority":
+                        "high",
+
+                    "Tags":
+                        "envelope"
+
                 },
+
                 timeout=5
             )
-    except Exception:
-        pass
+
+
+            print(
+                "Notification sent:",
+                response.status_code
+            )
+
+
+        else:
+
+            response = requests.post(
+
+                NOTIFY_WEBHOOK_URL,
+
+                json={
+
+                    "content":
+                        message,
+
+                    "text":
+                        message
+
+                },
+
+                timeout=5
+            )
+
+
+            print(
+                "Notification sent:",
+                response.status_code
+            )
+
+
+    except Exception as e:
+
+        # A notification failure should
+        # NEVER break the website.
+
+        print(
+            "Notification error:",
+            e
+        )
 
 
 # ==========================================
 # CONFIGURATION
 # ==========================================
 
-SECURITY_QUESTION = "What is this guy's name?"
+SECURITY_QUESTION = (
+    "What is this guy's name?"
+)
 
-SECURITY_IMAGE_URL = "/static/lorentz.jpg"
+
+SECURITY_IMAGE_URL = (
+    "/static/lorentz.jpg"
+)
+
 
 ACCEPTED_ANSWERS = [
+
     "Lorentz",
+
     "lorentz"
+
 ]
 
 
@@ -62,6 +231,7 @@ ACCEPTED_ANSWERS = [
 # ==========================================
 
 INTRO_TITLE = "Hey Char"
+
 
 INTRO_MESSAGE = """
 
@@ -100,6 +270,7 @@ Obviously you can copy/paste the message, and do whatever you like, but it would
 
 INDECISION_TITLE = "Not sure?"
 
+
 INDECISION_MESSAGE = """
 That's okay. Here's a bit more context to help:
 
@@ -124,6 +295,7 @@ And if you genuinely don't want to read any of them, that's okay too.
 # ==========================================
 
 MESSAGES = {
+
 
     # ======================================
     # MESSAGE 1 — HOW I FEEL
@@ -184,6 +356,7 @@ https://www.instagram.com/p/DZA_VRbCXVN/
 
 There is plenty more I can say, and would like to share with you, but I will leave it there for now. This is just the bare-bones “if we were to never speak again, I would want her to know” explanation. If you have any thoughts, want me to elaborate, or just simply want to hear from me, let me know.
 """,
+
 
     # ======================================
     # MESSAGE 2 — REFLECTION
@@ -287,6 +460,7 @@ https://www.instagram.com/p/DZA_VRbCXVN/
 There is plenty more I can say, and would like to share with you, but I will leave it there for now. This is just the bare-bones “if we were to never speak again, I would want her to know” explanation. If you have any thoughts, want me to elaborate, or just simply want to hear from me, let me know.
 """,
 
+
     # ======================================
     # MESSAGE 3 — CLOSURE
     # ======================================
@@ -346,6 +520,7 @@ https://www.instagram.com/p/DZA_VRbCXVN/
 
 There is plenty more I can say, and would like to share with you, but I will leave it there for now. This is just the bare-bones “if we were to never speak again, I would want her to know” explanation. If you have any thoughts, want me to elaborate, or just simply want to hear from me, let me know.
 """
+
 }
 
 
@@ -355,35 +530,68 @@ There is plenty more I can say, and would like to share with you, but I will lea
 
 def get_state():
 
-    if os.path.exists(STATE_FILE):
+    if os.path.exists(
+        STATE_FILE
+    ):
 
         try:
 
-            with open(STATE_FILE, "r") as f:
+            with open(
+                STATE_FILE,
+                "r"
+            ) as f:
+
                 return json.load(f)
 
         except Exception:
+
             pass
 
+
     return {
-        "chosen_option": None,
-        "authenticated": False
+
+        "chosen_option":
+            None,
+
+        "authenticated":
+            False,
+
+        "first_visit_time":
+            None
+
     }
 
 
 def save_state(state):
 
-    temp_file = STATE_FILE + ".tmp"
+    temp_file = (
+        STATE_FILE +
+        ".tmp"
+    )
 
-    with open(temp_file, "w") as f:
 
-        json.dump(state, f)
+    with open(
+        temp_file,
+        "w"
+    ) as f:
+
+        json.dump(
+            state,
+            f,
+            indent=2
+        )
 
         f.flush()
 
-        os.fsync(f.fileno())
+        os.fsync(
+            f.fileno()
+        )
 
-    os.replace(temp_file, STATE_FILE)
+
+    os.replace(
+        temp_file,
+        STATE_FILE
+    )
 
 
 # ==========================================
@@ -400,31 +608,49 @@ HTML_TEMPLATE = """
 
     <title>My Thoughts</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <style>
 
         :root {
+
             --bg-color: #f4f6f4;
+
             --card-bg: #ffffff;
+
             --text-main: #2c3531;
+
             --text-muted: #65746b;
+
             --accent-color: #e07a5f;
+
             --accent-hover: #cc6b50;
+
             --accent-active: #81b29a;
+
             --locked-bg: #e2e8e4;
+
             --locked-text: #94a39b;
+
             --border-radius: 16px;
+
         }
 
 
         * {
+
             box-sizing: border-box;
+
         }
 
 
         html {
+
             height: 100%;
+
         }
 
 
@@ -437,385 +663,555 @@ HTML_TEMPLATE = """
                 Roboto,
                 sans-serif;
 
-            color: var(--text-main);
+            color:
+                var(--text-main);
 
-            text-align: center;
+            text-align:
+                center;
 
-            padding: 20px;
+            padding:
+                20px;
 
-            margin: 0;
+            margin:
+                0;
 
-            min-height: 100vh;
+            min-height:
+                100vh;
 
-            box-sizing: border-box;
+            background-color:
+                var(--bg-color);
 
-            background-color: var(--bg-color);
+            position:
+                relative;
 
-            position: relative;
+            overflow-x:
+                hidden;
 
-            overflow-x: hidden;
         }
 
 
         #particle-canvas {
 
-            position: fixed;
+            position:
+                fixed;
 
-            top: 0;
+            top:
+                0;
 
-            left: 0;
+            left:
+                0;
 
-            width: 100%;
+            width:
+                100%;
 
-            height: 100%;
+            height:
+                100%;
 
-            display: block;
+            display:
+                block;
 
-            z-index: 0;
+            z-index:
+                0;
+
         }
 
 
         .card {
 
-            position: relative;
+            position:
+                relative;
 
-            z-index: 1;
+            z-index:
+                1;
 
-            background-color: var(--card-bg);
+            background-color:
+                var(--card-bg);
 
-            padding: 35px 30px;
+            padding:
+                35px 30px;
 
-            border-radius: var(--border-radius);
+            border-radius:
+                var(--border-radius);
 
-            max-width: 440px;
+            max-width:
+                440px;
 
-            width: 100%;
+            width:
+                100%;
 
-            margin: 0 auto;
+            margin:
+                0 auto;
 
             box-shadow:
-                0 10px 30px rgba(44, 53, 49, 0.06);
+                0 10px 30px
+                rgba(
+                    44,
+                    53,
+                    49,
+                    0.06
+                );
 
             border:
-                1px solid rgba(129, 178, 154, 0.2);
+                1px solid
+                rgba(
+                    129,
+                    178,
+                    154,
+                    0.2
+                );
 
         }
 
 
         h2 {
 
-            margin-top: 0;
+            margin-top:
+                0;
 
-            font-size: 1.6rem;
+            font-size:
+                1.6rem;
 
-            letter-spacing: -0.02em;
+            letter-spacing:
+                -0.02em;
 
-            color: var(--text-main);
+            color:
+                var(--text-main);
+
         }
 
 
         p {
 
-            color: var(--text-muted);
+            color:
+                var(--text-muted);
 
-            font-size: 0.95rem;
+            font-size:
+                0.95rem;
 
-            line-height: 1.6;
+            line-height:
+                1.6;
+
         }
 
 
         .question-image {
 
-            width: 100%;
+            width:
+                100%;
 
-            max-height: 200px;
+            max-height:
+                200px;
 
-            object-fit: cover;
+            object-fit:
+                cover;
 
             border-radius:
-                calc(var(--border-radius) - 8px);
+                calc(
+                    var(--border-radius)
+                    - 8px
+                );
 
-            margin-bottom: 15px;
+            margin-bottom:
+                15px;
 
             border:
-                1px solid rgba(129, 178, 154, 0.2);
+                1px solid
+                rgba(
+                    129,
+                    178,
+                    154,
+                    0.2
+                );
+
         }
 
 
         .input-group,
         .button-group {
 
-            margin-top: 20px;
+            margin-top:
+                20px;
 
-            display: flex;
+            display:
+                flex;
 
-            flex-direction: column;
+            flex-direction:
+                column;
 
-            gap: 12px;
+            gap:
+                12px;
+
         }
 
 
         input[type="text"] {
 
-            width: 100%;
+            width:
+                100%;
 
-            padding: 12px 14px;
+            padding:
+                12px 14px;
 
-            font-size: 1rem;
+            font-size:
+                1rem;
 
-            border: 1px solid #cbd5e1;
+            border:
+                1px solid
+                #cbd5e1;
 
             border-radius:
-                calc(var(--border-radius) - 6px);
+                calc(
+                    var(--border-radius)
+                    - 6px
+                );
 
-            background-color: #f8fafc;
+            background-color:
+                #f8fafc;
 
-            color: var(--text-main);
+            color:
+                var(--text-main);
 
-            outline: none;
+            outline:
+                none;
 
-            transition: border-color 0.2s;
+            transition:
+                border-color 0.2s;
+
         }
 
 
         input[type="text"]:focus {
 
-            border-color: var(--accent-color);
+            border-color:
+                var(--accent-color);
+
         }
 
 
         button {
 
-            display: block;
+            display:
+                block;
 
-            width: 100%;
+            width:
+                100%;
 
-            padding: 14px;
+            padding:
+                14px;
 
-            font-size: 1rem;
+            font-size:
+                1rem;
 
-            font-weight: 600;
+            font-weight:
+                600;
 
-            border: none;
+            border:
+                none;
 
             border-radius:
-                calc(var(--border-radius) - 6px);
+                calc(
+                    var(--border-radius)
+                    - 6px
+                );
 
-            cursor: pointer;
+            cursor:
+                pointer;
 
-            background-color: var(--accent-color);
+            background-color:
+                var(--accent-color);
 
-            color: #ffffff;
+            color:
+                #ffffff;
 
             transition:
                 background-color 0.2s,
                 transform 0.1s;
+
         }
 
 
         button:hover:not(:disabled) {
 
-            background-color: var(--accent-hover);
+            background-color:
+                var(--accent-hover);
+
         }
 
 
         button:active:not(:disabled) {
 
-            transform: scale(0.98);
+            transform:
+                scale(0.98);
+
         }
 
 
         button:disabled {
 
-            background-color: var(--locked-bg);
+            background-color:
+                var(--locked-bg);
 
-            color: var(--locked-text);
+            color:
+                var(--locked-text);
 
-            cursor: not-allowed;
+            cursor:
+                not-allowed;
+
         }
 
 
         .envelope-btn {
 
-            display: flex;
+            display:
+                flex;
 
-            align-items: center;
+            align-items:
+                center;
 
-            justify-content: center;
+            justify-content:
+                center;
 
-            gap: 10px;
+            gap:
+                10px;
 
-            width: 100%;
+            width:
+                100%;
 
-            padding: 14px;
+            padding:
+                14px;
 
-            font-size: 1rem;
+            font-size:
+                1rem;
 
-            font-weight: 600;
+            font-weight:
+                600;
 
-            border: none;
+            border:
+                none;
 
             border-radius:
-                calc(var(--border-radius) - 6px);
+                calc(
+                    var(--border-radius)
+                    - 6px
+                );
 
-            cursor: pointer;
+            cursor:
+                pointer;
 
-            background-color: var(--accent-color);
+            background-color:
+                var(--accent-color);
 
-            color: #ffffff;
+            color:
+                #ffffff;
 
             transition:
                 background-color 0.2s,
                 transform 0.1s;
+
         }
 
 
         .envelope-btn:hover:not(:disabled) {
 
-            background-color: var(--accent-hover);
+            background-color:
+                var(--accent-hover);
+
         }
 
 
         .envelope-btn:active:not(:disabled) {
 
-            transform: scale(0.98);
+            transform:
+                scale(0.98);
+
         }
 
 
         .envelope-btn:disabled {
 
-            background-color: var(--locked-bg);
+            background-color:
+                var(--locked-bg);
 
-            color: var(--locked-text);
+            color:
+                var(--locked-text);
 
-            cursor: not-allowed;
+            cursor:
+                not-allowed;
+
         }
 
 
         .envelope-btn svg {
 
-            flex-shrink: 0;
+            flex-shrink:
+                0;
+
         }
 
 
         button.secondary {
 
-            background-color: transparent;
+            background-color:
+                transparent;
 
-            color: var(--text-muted);
+            color:
+                var(--text-muted);
 
-            border: 1px solid #cbd5e1;
+            border:
+                1px solid
+                #cbd5e1;
+
         }
 
 
         button.secondary:hover:not(:disabled) {
 
-            background-color: #f1f5f2;
+            background-color:
+                #f1f5f2;
+
         }
 
 
-        /*
-         * ==========================================
-         * MESSAGE RESULT / SCROLLING
-         * ==========================================
-         *
-         * The message itself gets a fixed maximum
-         * height and its own scrollbar.
-         *
-         * This means the page does not grow to the
-         * full length of the message, and the user
-         * can scroll through the message independently.
-         */
+        /* =====================================
+           MESSAGE SCROLLING
+        ====================================== */
 
         #result {
 
-            margin-top: 25px;
+            margin-top:
+                25px;
 
-            padding: 20px;
+            padding:
+                20px;
 
-            background-color: #f7f9f7;
+            background-color:
+                #f7f9f7;
 
             border-left:
-                4px solid var(--accent-active);
+                4px solid
+                var(--accent-active);
 
-            border-radius: 8px;
+            border-radius:
+                8px;
 
-            text-align: left;
+            text-align:
+                left;
 
-            word-break: break-word;
+            word-break:
+                break-word;
 
             border-top:
-                1px solid rgba(129, 178, 154, 0.15);
+                1px solid
+                rgba(
+                    129,
+                    178,
+                    154,
+                    0.15
+                );
 
             border-right:
-                1px solid rgba(129, 178, 154, 0.15);
+                1px solid
+                rgba(
+                    129,
+                    178,
+                    154,
+                    0.15
+                );
 
             border-bottom:
-                1px solid rgba(129, 178, 154, 0.15);
+                1px solid
+                rgba(
+                    129,
+                    178,
+                    154,
+                    0.15
+                );
 
-            /*
-             * IMPORTANT:
-             * This creates the scrollable message area.
-             */
-            max-height: 60vh;
+            max-height:
+                60vh;
 
-            overflow-y: auto;
+            overflow-y:
+                auto;
 
-            /*
-             * Keep the scrollbar behaviour smooth.
-             */
-            overscroll-behavior: contain;
+            overscroll-behavior:
+                contain;
 
-            /*
-             * Make scrolling feel natural on iOS.
-             */
-            -webkit-overflow-scrolling: touch;
+            -webkit-overflow-scrolling:
+                touch;
+
         }
 
 
         #result p {
 
-            color: var(--text-main);
+            color:
+                var(--text-main);
 
-            line-height: 1.7;
+            line-height:
+                1.7;
 
-            white-space: pre-wrap;
+            white-space:
+                pre-wrap;
 
-            margin-top: 8px;
+            margin-top:
+                8px;
 
-            margin-bottom: 0;
+            margin-bottom:
+                0;
+
         }
 
 
         #result::-webkit-scrollbar {
 
-            width: 8px;
+            width:
+                8px;
+
         }
 
 
         #result::-webkit-scrollbar-track {
 
-            background: transparent;
+            background:
+                transparent;
+
         }
 
 
         #result::-webkit-scrollbar-thumb {
 
-            background: rgba(101, 116, 107, 0.35);
+            background:
+                rgba(
+                    101,
+                    116,
+                    107,
+                    0.35
+                );
 
-            border-radius: 10px;
+            border-radius:
+                10px;
+
         }
 
 
         #result::-webkit-scrollbar-thumb:hover {
 
-            background: rgba(101, 116, 107, 0.55);
+            background:
+                rgba(
+                    101,
+                    116,
+                    107,
+                    0.55
+                );
+
         }
 
 
         .hidden {
 
-            display: none !important;
+            display:
+                none !important;
+
         }
 
 
@@ -825,84 +1221,133 @@ HTML_TEMPLATE = """
 
         .modal-overlay {
 
-            position: fixed;
+            position:
+                fixed;
 
-            top: 0;
+            top:
+                0;
 
-            left: 0;
+            left:
+                0;
 
-            width: 100%;
+            width:
+                100%;
 
-            height: 100%;
+            height:
+                100%;
 
             background:
-                rgba(44, 53, 49, 0.55);
+                rgba(
+                    44,
+                    53,
+                    49,
+                    0.55
+                );
 
-            display: flex;
+            display:
+                flex;
 
-            justify-content: center;
+            justify-content:
+                center;
 
-            align-items: center;
+            align-items:
+                center;
 
-            z-index: 1000;
+            z-index:
+                1000;
 
-            padding: 20px;
+            padding:
+                20px;
+
         }
 
 
         .modal-box {
 
-            background-color: var(--card-bg);
+            background-color:
+                var(--card-bg);
 
-            border-radius: var(--border-radius);
+            border-radius:
+                var(--border-radius);
 
-            max-width: 440px;
+            max-width:
+                440px;
 
-            width: 100%;
+            width:
+                100%;
 
-            max-height: 80vh;
+            max-height:
+                80vh;
 
-            display: flex;
+            display:
+                flex;
 
-            flex-direction: column;
+            flex-direction:
+                column;
 
             box-shadow:
-                0 10px 30px rgba(44, 53, 49, 0.2);
+                0 10px 30px
+                rgba(
+                    44,
+                    53,
+                    49,
+                    0.2
+                );
 
             border:
-                1px solid rgba(129, 178, 154, 0.2);
+                1px solid
+                rgba(
+                    129,
+                    178,
+                    154,
+                    0.2
+                );
 
-            overflow: hidden;
+            overflow:
+                hidden;
+
         }
 
 
         .modal-header {
 
-            padding: 25px 25px 10px 25px;
+            padding:
+                25px 25px 10px 25px;
+
         }
 
 
         .modal-header h2 {
 
-            margin: 0;
+            margin:
+                0;
+
         }
 
 
         .modal-body {
 
-            padding: 10px 25px;
+            padding:
+                10px 25px;
 
-            overflow-y: auto;
+            overflow-y:
+                auto;
 
-            text-align: left;
+            text-align:
+                left;
 
-            color: var(--text-main);
+            color:
+                var(--text-main);
 
-            font-size: 0.95rem;
+            font-size:
+                0.95rem;
 
-            line-height: 1.7;
+            line-height:
+                1.7;
 
-            white-space: pre-wrap;
+            white-space:
+                pre-wrap;
+
         }
 
 
@@ -911,11 +1356,15 @@ HTML_TEMPLATE = """
             padding:
                 15px 25px 25px 25px;
 
-            display: flex;
+            display:
+                flex;
 
-            flex-direction: column;
+            flex-direction:
+                column;
 
-            gap: 10px;
+            gap:
+                10px;
+
         }
 
     </style>
@@ -925,7 +1374,9 @@ HTML_TEMPLATE = """
 
 <body>
 
-    <canvas id="particle-canvas"></canvas>
+    <canvas
+        id="particle-canvas"
+    ></canvas>
 
 
     <!-- ======================================
@@ -934,7 +1385,9 @@ HTML_TEMPLATE = """
 
     <div class="card">
 
-        <h2>Choose Wisely</h2>
+        <h2>
+            Choose Wisely
+        </h2>
 
 
         <!-- SECURITY QUESTION -->
@@ -953,7 +1406,9 @@ HTML_TEMPLATE = """
 
 
             <p id="question-label">
+
                 {{ question }}
+
             </p>
 
 
@@ -970,7 +1425,9 @@ HTML_TEMPLATE = """
                 <button
                     onclick="playClick(); verifyAnswer()"
                 >
+
                     Verify Answer
+
                 </button>
 
             </div>
@@ -985,7 +1442,9 @@ HTML_TEMPLATE = """
                 "
                 class="hidden"
             >
+
                 Incorrect answer. Try again.
+
             </p>
 
         </div>
@@ -993,14 +1452,21 @@ HTML_TEMPLATE = """
 
         <!-- MESSAGE CHOICE -->
 
-        <div id="choice-section" class="hidden">
+        <div
+            id="choice-section"
+            class="hidden"
+        >
 
             <p id="status">
-                Well done! You are free to select a message now :)
+
+                Well done! You are free to
+                select a message now :)
+
             </p>
 
 
             <div class="button-group">
+
 
                 <!-- MESSAGE 1 -->
 
@@ -1046,7 +1512,9 @@ HTML_TEMPLATE = """
 
                     </svg>
 
-                    <span>Message 1</span>
+                    <span>
+                        Message 1
+                    </span>
 
                 </button>
 
@@ -1095,7 +1563,9 @@ HTML_TEMPLATE = """
 
                     </svg>
 
-                    <span>Message 2</span>
+                    <span>
+                        Message 2
+                    </span>
 
                 </button>
 
@@ -1144,7 +1614,9 @@ HTML_TEMPLATE = """
 
                     </svg>
 
-                    <span>Message 3</span>
+                    <span>
+                        Message 3
+                    </span>
 
                 </button>
 
@@ -1159,7 +1631,9 @@ HTML_TEMPLATE = """
                 style="margin-top: 12px;"
                 onclick="playClick(); showIndecision()"
             >
+
                 I can't choose
+
             </button>
 
 
@@ -1207,7 +1681,9 @@ HTML_TEMPLATE = """
                     id="intro-continue-btn"
                     onclick="playClick(); closeIntro()"
                 >
+
                     I've read this
+
                 </button>
 
             </div>
@@ -1255,7 +1731,9 @@ HTML_TEMPLATE = """
                     onclick="playClick(); confirmChoice()"
                     disabled
                 >
+
                     Yes, I'm sure
+
                 </button>
 
 
@@ -1263,7 +1741,9 @@ HTML_TEMPLATE = """
                     class="secondary"
                     onclick="playClick(); cancelChoice()"
                 >
+
                     Wait, not yet
+
                 </button>
 
             </div>
@@ -1297,7 +1777,9 @@ HTML_TEMPLATE = """
                 class="modal-body"
                 style="white-space: pre-wrap;"
             >
+
                 {{ indecision_message }}
+
             </div>
 
 
@@ -1306,7 +1788,9 @@ HTML_TEMPLATE = """
                 <button
                     onclick="playClick(); closeIndecision()"
                 >
+
                     Okay
+
                 </button>
 
             </div>
@@ -1325,7 +1809,10 @@ HTML_TEMPLATE = """
         (function() {
 
             const canvas =
-                document.getElementById('particle-canvas');
+                document.getElementById(
+                    'particle-canvas'
+                );
+
 
             if (!canvas) {
                 return;
@@ -1335,26 +1822,38 @@ HTML_TEMPLATE = """
             const ctx =
                 canvas.getContext('2d');
 
+
             if (!ctx) {
                 return;
             }
 
 
-            let width, height, particles;
+            let width;
+            let height;
+            let particles;
 
 
             const colors = [
+
                 '#81b29a',
+
                 '#e07a5f',
+
                 '#a8c4b4',
+
                 '#eba488'
+
             ];
 
 
             const mouse = {
+
                 x: -9999,
+
                 y: -9999,
+
                 active: false
+
             };
 
 
@@ -1363,6 +1862,7 @@ HTML_TEMPLATE = """
                 width =
                     canvas.width =
                     window.innerWidth;
+
 
                 height =
                     canvas.height =
@@ -1375,10 +1875,18 @@ HTML_TEMPLATE = """
 
                 const count =
                     Math.min(
+
                         140,
+
                         Math.floor(
-                            (width * height) / 9000
+
+                            (
+                                width *
+                                height
+                            ) / 9000
+
                         )
+
                     );
 
 
@@ -1402,12 +1910,16 @@ HTML_TEMPLATE = """
                             height,
 
                         vx:
-                            (Math.random() - 0.5)
-                            * 0.4,
+                            (
+                                Math.random()
+                                - 0.5
+                            ) * 0.4,
 
                         vy:
-                            (Math.random() - 0.5)
-                            * 0.4,
+                            (
+                                Math.random()
+                                - 0.5
+                            ) * 0.4,
 
                         r:
                             Math.random()
@@ -1438,32 +1950,50 @@ HTML_TEMPLATE = """
                 );
 
 
-                for (let p of particles) {
+                for (
+                    let p of particles
+                ) {
 
                     p.x += p.vx;
+
                     p.y += p.vy;
 
 
                     if (p.x < -10)
-                        p.x = width + 10;
+                        p.x =
+                            width + 10;
 
-                    if (p.x > width + 10)
+
+                    if (
+                        p.x >
+                        width + 10
+                    )
                         p.x = -10;
 
-                    if (p.y < -10)
-                        p.y = height + 10;
 
-                    if (p.y > height + 10)
+                    if (p.y < -10)
+                        p.y =
+                            height + 10;
+
+
+                    if (
+                        p.y >
+                        height + 10
+                    )
                         p.y = -10;
 
 
                     if (mouse.active) {
 
                         const dx =
-                            p.x - mouse.x;
+                            p.x -
+                            mouse.x;
+
 
                         const dy =
-                            p.y - mouse.y;
+                            p.y -
+                            mouse.y;
+
 
                         const dist =
                             Math.sqrt(
@@ -1471,26 +2001,37 @@ HTML_TEMPLATE = """
                                 dy * dy
                             );
 
+
                         const radius = 130;
 
 
                         if (
-                            dist < radius &&
-                            dist > 0.01
+                            dist <
+                                radius &&
+                            dist >
+                                0.01
                         ) {
 
                             const force =
-                                (1 - dist / radius)
-                                * 1.8;
+                                (
+                                    1 -
+                                    dist /
+                                    radius
+                                ) * 1.8;
 
 
                             p.x +=
-                                (dx / dist)
-                                * force;
+                                (
+                                    dx /
+                                    dist
+                                ) * force;
+
 
                             p.y +=
-                                (dy / dist)
-                                * force;
+                                (
+                                    dy /
+                                    dist
+                                ) * force;
 
                         }
 
@@ -1499,18 +2040,29 @@ HTML_TEMPLATE = """
 
                     ctx.beginPath();
 
+
                     ctx.arc(
+
                         p.x,
+
                         p.y,
+
                         p.r,
+
                         0,
+
                         Math.PI * 2
+
                     );
+
 
                     ctx.fillStyle =
                         p.color;
 
-                    ctx.globalAlpha = 0.8;
+
+                    ctx.globalAlpha =
+                        0.8;
+
 
                     ctx.fill();
 
@@ -1535,15 +2087,20 @@ HTML_TEMPLATE = """
                         const a =
                             particles[i];
 
+
                         const b =
                             particles[j];
 
 
                         const dx =
-                            a.x - b.x;
+                            a.x -
+                            b.x;
+
 
                         const dy =
-                            a.y - b.y;
+                            a.y -
+                            b.y;
+
 
                         const dist =
                             Math.sqrt(
@@ -1552,14 +2109,18 @@ HTML_TEMPLATE = """
                             );
 
 
-                        if (dist < 130) {
+                        if (
+                            dist < 130
+                        ) {
 
                             ctx.beginPath();
+
 
                             ctx.moveTo(
                                 a.x,
                                 a.y
                             );
+
 
                             ctx.lineTo(
                                 b.x,
@@ -1571,12 +2132,18 @@ HTML_TEMPLATE = """
                                 'rgba(129, 178, 154, ' +
                                 (
                                     0.35 *
-                                    (1 - dist / 130)
+                                    (
+                                        1 -
+                                        dist /
+                                        130
+                                    )
                                 ) +
                                 ')';
 
 
-                            ctx.lineWidth = 1.2;
+                            ctx.lineWidth =
+                                1.2;
+
 
                             ctx.stroke();
 
@@ -1587,7 +2154,9 @@ HTML_TEMPLATE = """
                 }
 
 
-                requestAnimationFrame(step);
+                requestAnimationFrame(
+                    step
+                );
 
             }
 
@@ -1595,8 +2164,11 @@ HTML_TEMPLATE = """
             window.addEventListener(
                 'resize',
                 () => {
+
                     resize();
+
                     initParticles();
+
                 }
             );
 
@@ -1611,7 +2183,8 @@ HTML_TEMPLATE = """
                     mouse.y =
                         e.clientY;
 
-                    mouse.active = true;
+                    mouse.active =
+                        true;
 
                 }
             );
@@ -1620,7 +2193,10 @@ HTML_TEMPLATE = """
             window.addEventListener(
                 'mouseleave',
                 () => {
-                    mouse.active = false;
+
+                    mouse.active =
+                        false;
+
                 }
             );
 
@@ -1630,16 +2206,20 @@ HTML_TEMPLATE = """
                 (e) => {
 
                     if (
-                        e.touches.length > 0
+                        e.touches.length >
+                        0
                     ) {
 
                         mouse.x =
-                            e.touches[0].clientX;
+                            e.touches[0]
+                                .clientX;
 
                         mouse.y =
-                            e.touches[0].clientY;
+                            e.touches[0]
+                                .clientY;
 
-                        mouse.active = true;
+                        mouse.active =
+                            true;
 
                     }
 
@@ -1653,7 +2233,10 @@ HTML_TEMPLATE = """
             window.addEventListener(
                 'touchend',
                 () => {
-                    mouse.active = false;
+
+                    mouse.active =
+                        false;
+
                 }
             );
 
@@ -1675,16 +2258,18 @@ HTML_TEMPLATE = """
 
         let pendingChoice = null;
 
+
         /*
-         * IMPORTANT:
-         * Remember which message has already been
-         * rendered in the browser.
+         * This is critical.
          *
-         * checkState() runs every few seconds.
-         * Without this variable, applyLock() would
-         * rebuild the message every time and reset
-         * the scrollbar to the top.
+         * checkState() runs every 3 seconds.
+         * We only render the message once.
+         *
+         * Otherwise the result box would be
+         * rebuilt every 3 seconds, sending its
+         * scrollbar back to the top.
          */
+
         let renderedChoice = null;
 
 
@@ -1713,34 +2298,50 @@ HTML_TEMPLATE = """
                 const osc =
                     audioCtx.createOscillator();
 
+
                 const gain =
                     audioCtx.createGain();
 
 
-                osc.type = 'sine';
+                osc.type =
+                    'sine';
 
 
                 osc.frequency.setValueAtTime(
+
                     520,
+
                     audioCtx.currentTime
+
                 );
 
 
                 osc.frequency.exponentialRampToValueAtTime(
+
                     280,
-                    audioCtx.currentTime + 0.09
+
+                    audioCtx.currentTime +
+                    0.09
+
                 );
 
 
                 gain.gain.setValueAtTime(
+
                     0.12,
+
                     audioCtx.currentTime
+
                 );
 
 
                 gain.gain.exponentialRampToValueAtTime(
+
                     0.001,
-                    audioCtx.currentTime + 0.12
+
+                    audioCtx.currentTime +
+                    0.12
+
                 );
 
 
@@ -1753,8 +2354,12 @@ HTML_TEMPLATE = """
 
                 osc.start();
 
+
                 osc.stop(
-                    audioCtx.currentTime + 0.12
+
+                    audioCtx.currentTime +
+                    0.12
+
                 );
 
             } catch (e) {
@@ -1788,7 +2393,8 @@ HTML_TEMPLATE = """
                 {{ intro_message|tojson }};
 
 
-            btn.disabled = false;
+            btn.disabled =
+                false;
 
         }
 
@@ -1798,9 +2404,13 @@ HTML_TEMPLATE = """
             if (!introShown) {
 
                 document
-                    .getElementById('intro-modal')
+                    .getElementById(
+                        'intro-modal'
+                    )
                     .classList
-                    .remove('hidden');
+                    .remove(
+                        'hidden'
+                    );
 
 
                 typewriteIntro();
@@ -1808,9 +2418,13 @@ HTML_TEMPLATE = """
             } else {
 
                 document
-                    .getElementById('choice-section')
+                    .getElementById(
+                        'choice-section'
+                    )
                     .classList
-                    .remove('hidden');
+                    .remove(
+                        'hidden'
+                    );
 
             }
 
@@ -1819,19 +2433,28 @@ HTML_TEMPLATE = """
 
         function closeIntro() {
 
-            introShown = true;
+            introShown =
+                true;
 
 
             document
-                .getElementById('intro-modal')
+                .getElementById(
+                    'intro-modal'
+                )
                 .classList
-                .add('hidden');
+                .add(
+                    'hidden'
+                );
 
 
             document
-                .getElementById('choice-section')
+                .getElementById(
+                    'choice-section'
+                )
                 .classList
-                .remove('hidden');
+                .remove(
+                    'hidden'
+                );
 
         }
 
@@ -1843,9 +2466,13 @@ HTML_TEMPLATE = """
         function showIndecision() {
 
             document
-                .getElementById('indecision-modal')
+                .getElementById(
+                    'indecision-modal'
+                )
                 .classList
-                .remove('hidden');
+                .remove(
+                    'hidden'
+                );
 
         }
 
@@ -1853,9 +2480,13 @@ HTML_TEMPLATE = """
         function closeIndecision() {
 
             document
-                .getElementById('indecision-modal')
+                .getElementById(
+                    'indecision-modal'
+                )
                 .classList
-                .add('hidden');
+                .add(
+                    'hidden'
+                );
 
         }
 
@@ -1868,7 +2499,9 @@ HTML_TEMPLATE = """
 
             let answer =
                 document
-                    .getElementById('answer-input')
+                    .getElementById(
+                        'answer-input'
+                    )
                     .value;
 
 
@@ -1876,20 +2509,31 @@ HTML_TEMPLATE = """
 
                 let res =
                     await fetch(
+
                         '/verify',
+
                         {
-                            method: 'POST',
+
+                            method:
+                                'POST',
 
                             headers: {
+
                                 'Content-Type':
                                     'application/json'
+
                             },
 
                             body:
                                 JSON.stringify({
-                                    answer: answer
+
+                                    answer:
+                                        answer
+
                                 })
+
                         }
+
                     );
 
 
@@ -1900,9 +2544,13 @@ HTML_TEMPLATE = """
                 if (data.success) {
 
                     document
-                        .getElementById('auth-section')
+                        .getElementById(
+                            'auth-section'
+                        )
                         .classList
-                        .add('hidden');
+                        .add(
+                            'hidden'
+                        );
 
 
                     showIntroOrChoice();
@@ -1911,17 +2559,24 @@ HTML_TEMPLATE = """
 
                     let err =
                         document
-                            .getElementById('error-msg');
+                            .getElementById(
+                                'error-msg'
+                            );
 
 
                     err
                         .classList
-                        .remove('hidden');
+                        .remove(
+                            'hidden'
+                        );
 
 
                     document
-                        .getElementById('answer-input')
-                        .value = "";
+                        .getElementById(
+                            'answer-input'
+                        )
+                        .value =
+                        "";
 
                 }
 
@@ -1936,7 +2591,9 @@ HTML_TEMPLATE = """
 
         function handleKeyPress(e) {
 
-            if (e.key === 'Enter') {
+            if (
+                e.key === 'Enter'
+            ) {
 
                 verifyAnswer();
 
@@ -1951,7 +2608,8 @@ HTML_TEMPLATE = """
 
         function requestChoice(option) {
 
-            pendingChoice = option;
+            pendingChoice =
+                option;
 
 
             const yesBtn =
@@ -1961,16 +2619,22 @@ HTML_TEMPLATE = """
                     );
 
 
-            yesBtn.disabled = true;
+            yesBtn.disabled =
+                true;
 
 
             document
-                .getElementById('confirm-modal')
+                .getElementById(
+                    'confirm-modal'
+                )
                 .classList
-                .remove('hidden');
+                .remove(
+                    'hidden'
+                );
 
 
-            let secondsLeft = 5;
+            let secondsLeft =
+                5;
 
 
             yesBtn.innerText =
@@ -1979,12 +2643,15 @@ HTML_TEMPLATE = """
 
             const countdown =
                 setInterval(
+
                     () => {
 
                         secondsLeft -= 1;
 
 
-                        if (secondsLeft > 0) {
+                        if (
+                            secondsLeft > 0
+                        ) {
 
                             yesBtn.innerText =
                                 `Yes, I'm sure (${secondsLeft})`;
@@ -2006,7 +2673,9 @@ HTML_TEMPLATE = """
                         }
 
                     },
+
                     1000
+
                 );
 
         }
@@ -2014,7 +2683,8 @@ HTML_TEMPLATE = """
 
         function cancelChoice() {
 
-            pendingChoice = null;
+            pendingChoice =
+                null;
 
 
             document
@@ -2030,7 +2700,9 @@ HTML_TEMPLATE = """
                     'confirm-modal'
                 )
                 .classList
-                .add('hidden');
+                .add(
+                    'hidden'
+                );
 
         }
 
@@ -2041,7 +2713,9 @@ HTML_TEMPLATE = """
 
         async function confirmChoice() {
 
-            if (!pendingChoice)
+            if (
+                !pendingChoice
+            )
                 return;
 
 
@@ -2050,29 +2724,44 @@ HTML_TEMPLATE = """
 
 
             document
-                .getElementById('confirm-modal')
+                .getElementById(
+                    'confirm-modal'
+                )
                 .classList
-                .add('hidden');
+                .add(
+                    'hidden'
+                );
 
 
             try {
 
                 let res =
                     await fetch(
+
                         '/choose',
+
                         {
-                            method: 'POST',
+
+                            method:
+                                'POST',
 
                             headers: {
+
                                 'Content-Type':
                                     'application/json'
+
                             },
 
                             body:
                                 JSON.stringify({
-                                    choice: option
+
+                                    choice:
+                                        option
+
                                 })
+
                         }
+
                     );
 
 
@@ -2083,13 +2772,19 @@ HTML_TEMPLATE = """
                 if (data.success) {
 
                     applyLock(
+
                         option,
+
                         data.message
+
                     );
 
                 } else {
 
-                    alert(data.error);
+                    alert(
+                        data.error
+                    );
+
 
                     checkState();
 
@@ -2101,12 +2796,14 @@ HTML_TEMPLATE = """
                     "Network error. Please try again."
                 );
 
+
                 checkState();
 
             }
 
 
-            pendingChoice = null;
+            pendingChoice =
+                null;
 
         }
 
@@ -2115,48 +2812,35 @@ HTML_TEMPLATE = """
         // APPLY PERMANENT LOCK
         // ==========================================
 
-        function applyLock(chosen, msg) {
-
-            /*
-             * ======================================
-             * CRITICAL FIX
-             * ======================================
-             *
-             * checkState() runs every 3 seconds.
-             *
-             * If this function rebuilt #result every
-             * time, the scroll position was reset to
-             * zero every 3 seconds.
-             *
-             * We therefore only render the message
-             * if this particular choice has not
-             * already been rendered.
-             */
+        function applyLock(
+            chosen,
+            msg
+        ) {
 
             const alreadyRendered =
                 renderedChoice === chosen;
 
-
-            // Hide "I can't choose"
 
             document
                 .getElementById(
                     'indecision-btn'
                 )
                 .classList
-                .add('hidden');
+                .add(
+                    'hidden'
+                );
 
-
-            // Lock all envelopes
 
             document
                 .querySelectorAll(
                     '#choice-section .envelope-btn'
                 )
                 .forEach(
+
                     (b, index) => {
 
-                        b.disabled = true;
+                        b.disabled =
+                            true;
 
 
                         const num =
@@ -2175,12 +2859,9 @@ HTML_TEMPLATE = """
                             );
 
 
-                        // ==================================
-                        // CHOSEN MESSAGE
-                        // ==================================
-
                         if (
-                            num.toString() === chosen
+                            num.toString()
+                            === chosen
                         ) {
 
                             b.style.backgroundColor =
@@ -2227,10 +2908,6 @@ HTML_TEMPLATE = """
                             `;
 
 
-                        // ==================================
-                        // LOCKED MESSAGES
-                        // ==================================
-
                         } else {
 
                             label.textContent =
@@ -2271,29 +2948,37 @@ HTML_TEMPLATE = """
                         }
 
                     }
+
                 );
 
 
-            // Update status
-
             document
-                .getElementById('status')
+                .getElementById(
+                    'status'
+                )
                 .innerText =
                 "Choice permanently registered on server. Other options are locked.";
 
 
             /*
-             * ======================================
-             * ONLY BUILD THE MESSAGE ONCE
-             * ======================================
+             * Do NOT rebuild the message if it
+             * has already been rendered.
+             *
+             * This prevents the scrollbar from
+             * jumping to the top every 3 seconds.
              */
 
-            if (alreadyRendered) {
+            if (
+                alreadyRendered
+            ) {
+
                 return;
+
             }
 
 
-            renderedChoice = chosen;
+            renderedChoice =
+                chosen;
 
 
             let resBox =
@@ -2307,12 +2992,9 @@ HTML_TEMPLATE = """
             );
 
 
-            // Clear existing content
+            resBox.innerHTML =
+                "";
 
-            resBox.innerHTML = "";
-
-
-            // Message heading
 
             const heading =
                 document.createElement(
@@ -2325,10 +3007,10 @@ HTML_TEMPLATE = """
 
 
             heading.textContent =
-                "Message " + chosen + ":";
+                "Message " +
+                chosen +
+                ":";
 
-
-            // Message body
 
             const message =
                 document.createElement(
@@ -2352,11 +3034,10 @@ HTML_TEMPLATE = """
                 msg;
 
 
-            // Put them into result box
-
             resBox.appendChild(
                 heading
             );
+
 
             resBox.appendChild(
                 message
@@ -2375,8 +3056,10 @@ HTML_TEMPLATE = """
 
                 let res =
                     await fetch(
+
                         '/status?' +
                         new Date().getTime()
+
                     );
 
 
@@ -2384,16 +3067,18 @@ HTML_TEMPLATE = """
                     await res.json();
 
 
-                // A choice has already been made
-
-                if (data.chosen_option) {
+                if (
+                    data.chosen_option
+                ) {
 
                     document
                         .getElementById(
                             'auth-section'
                         )
                         .classList
-                        .add('hidden');
+                        .add(
+                            'hidden'
+                        );
 
 
                     document
@@ -2401,7 +3086,9 @@ HTML_TEMPLATE = """
                             'intro-modal'
                         )
                         .classList
-                        .add('hidden');
+                        .add(
+                            'hidden'
+                        );
 
 
                     document
@@ -2409,7 +3096,9 @@ HTML_TEMPLATE = """
                             'confirm-modal'
                         )
                         .classList
-                        .add('hidden');
+                        .add(
+                            'hidden'
+                        );
 
 
                     document
@@ -2417,7 +3106,9 @@ HTML_TEMPLATE = """
                             'indecision-modal'
                         )
                         .classList
-                        .add('hidden');
+                        .add(
+                            'hidden'
+                        );
 
 
                     document
@@ -2425,16 +3116,19 @@ HTML_TEMPLATE = """
                             'choice-section'
                         )
                         .classList
-                        .remove('hidden');
+                        .remove(
+                            'hidden'
+                        );
 
 
                     applyLock(
+
                         data.chosen_option,
+
                         data.message
+
                     );
 
-
-                // Authenticated but hasn't chosen
 
                 } else if (
                     data.authenticated
@@ -2445,7 +3139,9 @@ HTML_TEMPLATE = """
                             'auth-section'
                         )
                         .classList
-                        .add('hidden');
+                        .add(
+                            'hidden'
+                        );
 
 
                     showIntroOrChoice();
@@ -2461,16 +3157,23 @@ HTML_TEMPLATE = """
         }
 
 
-        // Initial state check
+        // ==========================================
+        // INITIAL STATE
+        // ==========================================
 
         checkState();
 
 
-        // Continue checking state every 3 seconds
+        // ==========================================
+        // PERIODIC STATE CHECK
+        // ==========================================
 
         setInterval(
+
             checkState,
+
             3000
+
         );
 
     </script>
@@ -2488,12 +3191,51 @@ HTML_TEMPLATE = """
 @app.route('/')
 def home():
 
-    send_notification(
-        "🔗 The link has been accessed."
-    )
+    state =
+        get_state()
+
+
+    # ======================================
+    # RECORD FIRST VISIT
+    # ======================================
+
+    if not state.get(
+        "first_visit_time"
+    ):
+
+        now =
+            get_adelaide_time()
+
+
+        state[
+            "first_visit_time"
+        ] =
+            now.isoformat()
+
+
+        save_state(
+            state
+        )
+
+
+        # ==================================
+        # NOTIFY LINK VISIT
+        # ==================================
+
+        send_notification(
+
+            "🔗 The link has been visited.\n\n"
+            f"Time: {format_time(now)}\n"
+            "Timezone: Adelaide (ACST/ACDT)",
+
+            title=
+                "Char opened the link"
+
+        )
 
 
     return render_template_string(
+
         HTML_TEMPLATE,
 
         question=
@@ -2513,24 +3255,31 @@ def home():
 
         indecision_message=
             INDECISION_MESSAGE
+
     )
 
 
-@app.route('/status', methods=['GET'])
+@app.route(
+    '/status',
+    methods=['GET']
+)
 def status():
 
-    state = get_state()
+    state =
+        get_state()
 
 
-    chosen = state.get(
-        "chosen_option"
-    )
+    chosen =
+        state.get(
+            "chosen_option"
+        )
 
 
-    authenticated = state.get(
-        "authenticated",
-        False
-    )
+    authenticated =
+        state.get(
+            "authenticated",
+            False
+        )
 
 
     if chosen:
@@ -2560,49 +3309,76 @@ def status():
     })
 
 
-@app.route('/verify', methods=['POST'])
+@app.route(
+    '/verify',
+    methods=['POST']
+)
 def verify():
 
-    req_data = request.get_json()
+    req_data =
+        request.get_json()
 
 
-    user_answer = req_data.get(
-        "answer",
-        ""
-    ).strip().lower()
+    user_answer =
+        req_data.get(
+            "answer",
+            ""
+        ).strip().lower()
 
 
     if user_answer in [
+
         answer.lower()
-        for answer in ACCEPTED_ANSWERS
+
+        for answer
+        in ACCEPTED_ANSWERS
+
     ]:
 
-        state = get_state()
+        state =
+            get_state()
 
 
-        state["authenticated"] = True
+        state[
+            "authenticated"
+        ] =
+            True
 
 
-        save_state(state)
+        save_state(
+            state
+        )
 
 
         return jsonify({
-            "success": True
+
+            "success":
+                True
+
         })
 
 
     return jsonify({
-        "success": False
+
+        "success":
+            False
+
     }), 400
 
 
-@app.route('/choose', methods=['POST'])
+@app.route(
+    '/choose',
+    methods=['POST']
+)
 def choose():
 
-    state = get_state()
+    state =
+        get_state()
 
 
-    # Must authenticate first
+    # ======================================
+    # MUST AUTHENTICATE
+    # ======================================
 
     if not state.get(
         "authenticated",
@@ -2611,7 +3387,8 @@ def choose():
 
         return jsonify({
 
-            "success": False,
+            "success":
+                False,
 
             "error":
                 "Not authenticated!"
@@ -2619,7 +3396,9 @@ def choose():
         }), 403
 
 
-    # Choice already made
+    # ======================================
+    # CHOICE ALREADY MADE
+    # ======================================
 
     if state.get(
         "chosen_option"
@@ -2627,7 +3406,8 @@ def choose():
 
         return jsonify({
 
-            "success": False,
+            "success":
+                False,
 
             "error":
                 "A choice has already been made and locked!"
@@ -2635,28 +3415,127 @@ def choose():
         }), 400
 
 
-    req_data = request.get_json()
+    req_data =
+        request.get_json()
 
 
-    choice = str(
-        req_data.get(
-            "choice"
+    choice =
+        str(
+            req_data.get(
+                "choice"
+            )
         )
-    )
 
 
-    # Valid choice
+    # ======================================
+    # VALID CHOICE
+    # ======================================
 
     if choice in MESSAGES:
 
-        state["chosen_option"] = choice
+        # ==================================
+        # GET CHOICE TIME
+        # ==================================
+
+        choice_time =
+            get_adelaide_time()
 
 
-        save_state(state)
+        # ==================================
+        # CALCULATE TIME SINCE FIRST VISIT
+        # ==================================
 
+        first_visit_time =
+            state.get(
+                "first_visit_time"
+            )
+
+
+        elapsed_seconds =
+            None
+
+
+        elapsed_display =
+            "Unknown"
+
+
+        if first_visit_time:
+
+            try:
+
+                first_visit =
+                    datetime.fromisoformat(
+                        first_visit_time
+                    )
+
+
+                elapsed_seconds =
+                    (
+                        choice_time -
+                        first_visit
+                    ).total_seconds()
+
+
+                elapsed_display =
+                    format_duration(
+                        elapsed_seconds
+                    )
+
+            except Exception as e:
+
+                print(
+                    "Could not calculate "
+                    "elapsed time:",
+                    e
+                )
+
+
+        # ==================================
+        # SAVE CHOICE
+        # ==================================
+
+        state[
+            "chosen_option"
+        ] =
+            choice
+
+
+        state[
+            "choice_time"
+        ] =
+            choice_time.isoformat()
+
+
+        state[
+            "elapsed_seconds"
+        ] =
+            elapsed_seconds
+
+
+        save_state(
+            state
+        )
+
+
+        # ==================================
+        # SEND NOTIFICATION
+        # ==================================
 
         send_notification(
-            f"💌 A choice has been made: Message {choice} was opened."
+
+            f"💌 Char opened Message {choice}\n\n"
+
+            f"Time: "
+            f"{format_time(choice_time)}\n"
+
+            f"Time since link was first visited: "
+            f"{elapsed_display}\n"
+
+            "Timezone: Adelaide (ACST/ACDT)",
+
+            title=
+                "Char chose a message"
+
         )
 
 
@@ -2682,6 +3561,10 @@ def choose():
     }), 400
 
 
+# ==========================================
+# RESET
+# ==========================================
+
 @app.route('/reset')
 def reset_state():
 
@@ -2694,7 +3577,9 @@ def reset_state():
         )
 
 
-    return "State has been reset!"
+    return (
+        "State has been reset!"
+    )
 
 
 # ==========================================
@@ -2703,15 +3588,21 @@ def reset_state():
 
 if __name__ == '__main__':
 
-    port = int(
-        os.environ.get(
-            "PORT",
-            5000
+    port =
+        int(
+            os.environ.get(
+                "PORT",
+                5000
+            )
         )
-    )
 
 
     app.run(
-        host="0.0.0.0",
-        port=port
+
+        host=
+            "0.0.0.0",
+
+        port=
+            port
+
     )
