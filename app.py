@@ -220,6 +220,8 @@ Just to let you know, this website will automatically be taken down 24 hours aft
 
 Obviously you can copy/paste the message, and do whatever you like, but it would be nice to keep this between us if possible.
 
+I almost didn't send you this link - I have found that the value in simply putting the words on the page was mostly what I was looking for. It's been about a week since I finished it, and it has just sat here. Nonetheless, I may as well let you know what I have been thinking - I hope it provides you with some clarity. The messages were written at different stages over the last months, so they may do different jobs at conveying how I really feel, but I have done my best - I hope this makes you feel better, not worse.
+
 """
 
 
