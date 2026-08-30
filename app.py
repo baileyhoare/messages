@@ -996,7 +996,7 @@ HTML_TEMPLATE = """
         <div id="choice-section" class="hidden">
 
             <p id="status">
-                Verified! Once you select a message, the server will permanently lock the other two.
+                Well done! You are free to select a message now :)
             </p>
 
 
@@ -1241,8 +1241,7 @@ HTML_TEMPLATE = """
 
                 <p style="margin:0;">
 
-                    Once you choose, the other two messages lock forever.
-                    There's no way back from here.
+                    Make sure this is the right one.
 
                 </p>
 
