@@ -1071,13 +1071,23 @@ button.secondary:hover:not(:disabled) {
         </div>
 
 
-        <button
+                <button
             id="indecision-btn"
             class="secondary"
             style="margin-top: 12px;"
             onclick="showIndecision()"
         >
             I can't choose
+        </button>
+
+
+        <button
+            id="reopen-intro-btn"
+            class="secondary"
+            style="margin-top: 12px;"
+            onclick="reopenIntro()"
+        >
+            Read the intro again
         </button>
 
 
@@ -1596,6 +1606,16 @@ function closeIntro() {
         .getElementById("choice-section")
         .classList
         .remove("hidden");
+}
+
+function reopenIntro() {
+
+    document
+        .getElementById("intro-modal")
+        .classList
+        .remove("hidden");
+
+    typewriteIntro();
 }
 
 
