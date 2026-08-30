@@ -7,17 +7,22 @@ app = Flask(__name__)
 
 STATE_FILE = "state.json"
 
+
 # ==========================================
 # NOTIFICATIONS
 # ==========================================
+
 # Set to False when you're ready to send this to the real recipient.
 # While True, no notifications are sent - safe for testing.
 TESTING_MODE = True
 
 # A webhook URL that receives a POST with a JSON body like {"content": "..."}.
-# Easiest free option: https://ntfy.sh - pick a private topic name, e.g.
-#   NOTIFY_WEBHOOK_URL = "https://ntfy.sh/your-private-topic-name-here"
-# Discord and Slack "incoming webhook" URLs also work.
+# Easiest free option: https://ntfy.sh
+#
+# Example:
+# NOTIFY_WEBHOOK_URL = "https://ntfy.sh/your-private-topic-name-here"
+#
+# Discord and Slack incoming webhook URLs also work.
 NOTIFY_WEBHOOK_URL = ""
 
 
@@ -33,7 +38,6 @@ def send_notification(message):
                 timeout=5
             )
         else:
-            # Discord/Slack-style webhook
             requests.post(
                 NOTIFY_WEBHOOK_URL,
                 json={
@@ -43,7 +47,8 @@ def send_notification(message):
                 timeout=5
             )
     except Exception:
-        pass  # Never let a failed notification break the site
+        # Never let a failed notification break the site.
+        pass
 
 
 # ==========================================
@@ -52,7 +57,7 @@ def send_notification(message):
 
 SECURITY_QUESTION = "What is this guy's name?"
 
-# Replace with your direct image URL, or leave as "" for text-only
+# Replace with your direct image URL, or leave as "" for text-only.
 SECURITY_IMAGE_URL = "/static/lorentz.jpg"
 
 ACCEPTED_ANSWERS = [
@@ -165,7 +170,6 @@ https://www.instagram.com/p/DZA_VRbCXVN/
 There is plenty more I can say, and would like to share with you, but I will leave it there for now. This is just the bare-bones “if we were to never speak again, I would want her to know” explanation. If you have any thoughts, want me to elaborate, or just simply want to hear from me, let me know.
 """,
 
-
     # ======================================
     # MESSAGE 2 — REFLECTION
     # ======================================
@@ -268,14 +272,12 @@ https://www.instagram.com/p/DZA_VRbCXVN/
 There is plenty more I can say, and would like to share with you, but I will leave it there for now. This is just the bare-bones “if we were to never speak again, I would want her to know” explanation. If you have any thoughts, want me to elaborate, or just simply want to hear from me, let me know.
 """,
 
-
     # ======================================
     # MESSAGE 3 — CLOSURE
     # ======================================
 
     "3": """
 Hey Char,
-
 
 Firstly, I hope you are well. I really do. I hope you had an amazing time at home in Canada, as well as over your Summer break. It has been nice to watch along from a distance and see you enjoying yourself.
 
@@ -295,7 +297,9 @@ I miss you in the ways that I knew I would, but also so much more. I miss your v
 
 For so long, having you physically elsewhere was something I was learning to manage. It was difficult, and I hated the distance, but you were still my person.
 
-Not having you here was hard, but not having you at all is near-impossible.   You knew me better than anyone, and I never had to explain myself around you. Eventually, I took this for granted, and now there is a strange absence where you used to be.
+Not having you here was hard, but not having you at all is near-impossible.
+
+You knew me better than anyone, and I never had to explain myself around you. Eventually, I took this for granted, and now there is a strange absence where you used to be.
 
 Life is okay. I am getting on with things. Being so very busy does help, but in the quiet times, at the end of the day, or on a Sunday afternoon, everything is quiet, and it's your voice I wish I could hear the most.
 
@@ -1260,7 +1264,9 @@ HTML_TEMPLATE = """
             }
 
 
-            let width, height, particles;
+            let width;
+            let height;
+            let particles;
 
 
             const colors = [
@@ -1359,8 +1365,6 @@ HTML_TEMPLATE = """
 
 
                 for (let p of particles) {
-
-                    // Gentle drift
 
                     p.x += p.vx;
                     p.y += p.vy;
@@ -1602,8 +1606,8 @@ HTML_TEMPLATE = """
         // ==========================================
 
         let introShown = false;
-
         let pendingChoice = null;
+        let countdownTimer = null;
 
 
         // ==========================================
@@ -1676,10 +1680,8 @@ HTML_TEMPLATE = """
                 );
 
             } catch (e) {
-
                 // Audio unavailable:
                 // fail silently.
-
             }
 
         }
@@ -1785,60 +1787,77 @@ HTML_TEMPLATE = """
 
         async function verifyAnswer() {
 
-            let answer =
-                document
-                    .getElementById('answer-input')
-                    .value;
-
-
-            let res =
-                await fetch(
-                    '/verify',
-                    {
-                        method: 'POST',
-
-                        headers: {
-                            'Content-Type':
-                                'application/json'
-                        },
-
-                        body:
-                            JSON.stringify({
-                                answer: answer
-                            })
-                    }
+            const input =
+                document.getElementById(
+                    'answer-input'
                 );
 
 
-            let data =
-                await res.json();
+            const answer =
+                input.value;
 
 
-            if (data.success) {
+            try {
 
-                document
-                    .getElementById('auth-section')
-                    .classList
-                    .add('hidden');
+                const res =
+                    await fetch(
+                        '/verify',
+                        {
+                            method: 'POST',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    answer: answer
+                                })
+                        }
+                    );
 
 
-                showIntroOrChoice();
+                const data =
+                    await res.json();
 
-            } else {
 
-                let err =
+                if (data.success) {
+
                     document
-                        .getElementById('error-msg');
+                        .getElementById('auth-section')
+                        .classList
+                        .add('hidden');
 
 
-                err
-                    .classList
-                    .remove('hidden');
+                    showIntroOrChoice();
+
+                } else {
+
+                    const err =
+                        document.getElementById(
+                            'error-msg'
+                        );
 
 
-                document
-                    .getElementById('answer-input')
-                    .value = "";
+                    err
+                        .classList
+                        .remove('hidden');
+
+
+                    input.value = "";
+
+                    input.focus();
+
+                }
+
+            } catch (e) {
+
+                console.error(e);
+
+                alert(
+                    "Something went wrong. Please try again."
+                );
 
             }
 
@@ -1862,14 +1881,20 @@ HTML_TEMPLATE = """
 
         function requestChoice(option) {
 
+            // Don't allow another choice while
+            // the confirmation countdown is active.
+            if (pendingChoice !== null) {
+                return;
+            }
+
+
             pendingChoice = option;
 
 
             const yesBtn =
-                document
-                    .getElementById(
-                        'confirm-yes-btn'
-                    );
+                document.getElementById(
+                    'confirm-yes-btn'
+                );
 
 
             yesBtn.disabled = true;
@@ -1881,7 +1906,20 @@ HTML_TEMPLATE = """
                 .remove('hidden');
 
 
-            // Five-second countdown
+            // Clear any previous countdown.
+
+            if (countdownTimer !== null) {
+
+                clearInterval(
+                    countdownTimer
+                );
+
+                countdownTimer = null;
+
+            }
+
+
+            // Five-second countdown.
 
             let secondsLeft = 5;
 
@@ -1890,7 +1928,7 @@ HTML_TEMPLATE = """
                 `Yes, I'm sure (${secondsLeft})`;
 
 
-            const countdown =
+            countdownTimer =
                 setInterval(
                     () => {
 
@@ -1905,8 +1943,10 @@ HTML_TEMPLATE = """
                         } else {
 
                             clearInterval(
-                                countdown
+                                countdownTimer
                             );
+
+                            countdownTimer = null;
 
 
                             yesBtn.innerText =
@@ -1930,12 +1970,28 @@ HTML_TEMPLATE = """
             pendingChoice = null;
 
 
-            document
-                .getElementById(
+            if (countdownTimer !== null) {
+
+                clearInterval(
+                    countdownTimer
+                );
+
+                countdownTimer = null;
+
+            }
+
+
+            const yesBtn =
+                document.getElementById(
                     'confirm-yes-btn'
-                )
-                .innerText =
+                );
+
+
+            yesBtn.innerText =
                 "Yes, I'm sure";
+
+
+            yesBtn.disabled = true;
 
 
             document
@@ -1954,12 +2010,24 @@ HTML_TEMPLATE = """
 
         async function confirmChoice() {
 
-            if (!pendingChoice)
+            if (!pendingChoice) {
                 return;
+            }
 
 
             const option =
                 pendingChoice;
+
+
+            if (countdownTimer !== null) {
+
+                clearInterval(
+                    countdownTimer
+                );
+
+                countdownTimer = null;
+
+            }
 
 
             document
@@ -1970,7 +2038,7 @@ HTML_TEMPLATE = """
 
             try {
 
-                let res =
+                const res =
                     await fetch(
                         '/choose',
                         {
@@ -1989,7 +2057,7 @@ HTML_TEMPLATE = """
                     );
 
 
-                let data =
+                const data =
                     await res.json();
 
 
@@ -2009,6 +2077,8 @@ HTML_TEMPLATE = """
                 }
 
             } catch (e) {
+
+                console.error(e);
 
                 alert(
                     "Network error. Please try again."
@@ -2179,16 +2249,9 @@ HTML_TEMPLATE = """
 
             // ==========================================
             // DISPLAY MESSAGE
-            //
-            // IMPORTANT:
-            // We intentionally use textContent rather
-            // than innerHTML so the message cannot
-            // accidentally be interpreted as HTML.
-            // white-space: pre-wrap preserves all
-            // paragraph breaks.
             // ==========================================
 
-            let resBox =
+            const resBox =
                 document.getElementById(
                     'result'
                 );
@@ -2265,18 +2328,18 @@ HTML_TEMPLATE = """
 
             try {
 
-                let res =
+                const res =
                     await fetch(
                         '/status?' +
                         new Date().getTime()
                     );
 
 
-                let data =
+                const data =
                     await res.json();
 
 
-                // A choice has already been made
+                // A choice has already been made.
 
                 if (data.chosen_option) {
 
@@ -2326,7 +2389,7 @@ HTML_TEMPLATE = """
                     );
 
 
-                // Authenticated but hasn't chosen
+                // Authenticated but hasn't chosen.
 
                 } else if (
                     data.authenticated
@@ -2353,12 +2416,12 @@ HTML_TEMPLATE = """
         }
 
 
-        // Initial state check
+        // Initial state check.
 
         checkState();
 
 
-        // Continue checking state every 3 seconds
+        // Continue checking state every 3 seconds.
 
         setInterval(
             checkState,
@@ -2384,111 +2447,76 @@ def home():
         "🔗 The link has been accessed."
     )
 
-
     return render_template_string(
         HTML_TEMPLATE,
-
-        question=
-            SECURITY_QUESTION,
-
-        image_url=
-            SECURITY_IMAGE_URL,
-
-        intro_title=
-            INTRO_TITLE,
-
-        intro_message=
-            INTRO_MESSAGE,
-
-        indecision_title=
-            INDECISION_TITLE,
-
-        indecision_message=
-            INDECISION_MESSAGE
+        question=SECURITY_QUESTION,
+        image_url=SECURITY_IMAGE_URL,
+        intro_title=INTRO_TITLE,
+        intro_message=INTRO_MESSAGE,
+        indecision_title=INDECISION_TITLE,
+        indecision_message=INDECISION_MESSAGE
     )
 
 
 @app.route('/status', methods=['GET'])
 def status():
 
-    state =
-        get_state()
+    state = get_state()
 
+    chosen = state.get(
+        "chosen_option"
+    )
 
-    chosen =
-        state.get(
-            "chosen_option"
-        )
-
-
-    authenticated =
-        state.get(
-            "authenticated",
-            False
-        )
-
+    authenticated = state.get(
+        "authenticated",
+        False
+    )
 
     if chosen:
 
         return jsonify({
-
-            "chosen_option":
-                chosen,
-
-            "message":
-                MESSAGES[chosen],
-
-            "authenticated":
-                True
-
+            "chosen_option": chosen,
+            "message": MESSAGES[chosen],
+            "authenticated": True
         })
 
-
     return jsonify({
-
-        "chosen_option":
-            None,
-
-        "authenticated":
-            authenticated
-
+        "chosen_option": None,
+        "authenticated": authenticated
     })
 
 
 @app.route('/verify', methods=['POST'])
 def verify():
 
-    req_data =
-        request.get_json()
+    req_data = request.get_json(
+        silent=True
+    ) or {}
 
+    user_answer = req_data.get(
+        "answer",
+        ""
+    )
 
-    user_answer =
-        req_data.get(
-            "answer",
-            ""
-        ).strip().lower()
+    if not isinstance(user_answer, str):
+        user_answer = str(user_answer)
 
+    user_answer = user_answer.strip().lower()
 
     if user_answer in [
         answer.lower()
         for answer in ACCEPTED_ANSWERS
     ]:
 
-        state =
-            get_state()
+        state = get_state()
 
-
-        state["authenticated"] =
-            True
-
+        state["authenticated"] = True
 
         save_state(state)
-
 
         return jsonify({
             "success": True
         })
-
 
     return jsonify({
         "success": False
@@ -2498,11 +2526,9 @@ def verify():
 @app.route('/choose', methods=['POST'])
 def choose():
 
-    state =
-        get_state()
+    state = get_state()
 
-
-    # Must authenticate first
+    # Must authenticate first.
 
     if not state.get(
         "authenticated",
@@ -2510,78 +2536,58 @@ def choose():
     ):
 
         return jsonify({
-
             "success": False,
-
-            "error":
-                "Not authenticated!"
-
+            "error": "Not authenticated!"
         }), 403
 
 
-    # Choice already made
+    # Choice already made.
 
     if state.get(
         "chosen_option"
     ) is not None:
 
         return jsonify({
-
             "success": False,
-
             "error":
                 "A choice has already been made and locked!"
-
         }), 400
 
 
-    req_data =
-        request.get_json()
+    req_data = request.get_json(
+        silent=True
+    ) or {}
 
 
-    choice =
-        str(
-            req_data.get(
-                "choice"
-            )
+    choice = str(
+        req_data.get(
+            "choice",
+            ""
         )
+    )
 
 
-    # Valid choice
+    # Valid choice.
 
     if choice in MESSAGES:
 
-        state["chosen_option"] =
-            choice
-
+        state["chosen_option"] = choice
 
         save_state(state)
-
 
         send_notification(
             f"💌 A choice has been made: Message {choice} was opened."
         )
 
-
         return jsonify({
-
-            "success":
-                True,
-
-            "message":
-                MESSAGES[choice]
-
+            "success": True,
+            "message": MESSAGES[choice]
         })
 
 
     return jsonify({
-
-        "success":
-            False,
-
-        "error":
-            "Invalid choice"
-
+        "success": False,
+        "error": "Invalid choice"
     }), 400
 
 
@@ -2596,7 +2602,6 @@ def reset_state():
             STATE_FILE
         )
 
-
     return "State has been reset!"
 
 
@@ -2606,14 +2611,12 @@ def reset_state():
 
 if __name__ == '__main__':
 
-    port =
-        int(
-            os.environ.get(
-                "PORT",
-                5000
-            )
+    port = int(
+        os.environ.get(
+            "PORT",
+            5000
         )
-
+    )
 
     app.run(
         host="0.0.0.0",
