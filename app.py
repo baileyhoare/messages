@@ -5,233 +5,192 @@ import requests
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-
 app = Flask(__name__)
-
 
 STATE_FILE = "state.json"
 
-
-# ==========================================
+# ============================================================
 # NOTIFICATIONS
-# ==========================================
+# ============================================================
 
-# ==========================================
 # IMPORTANT:
-#
-# False = notifications are ACTIVE.
-#
-# Set to True if you want to test the website
-# without receiving notifications.
-# ==========================================
-
+# Set this to False when you are ready for the real test.
 TESTING_MODE = False
 
-
-# ==========================================
-# YOUR NTFY TOPIC
-#
-# Replace YOUR-RANDOM-TOPIC-HERE with the
-# private/random topic you created in ntfy.
+# Put your ntfy.sh URL here.
 #
 # Example:
+# NOTIFY_WEBHOOK_URL = "https://ntfy.sh/your-private-topic"
 #
-# https://ntfy.sh/bailey-char-7f92k4m8xq
-# ==========================================
-
-NOTIFY_WEBHOOK_URL = (
-    "https://ntfy.sh/bailey-char-messages-030621"
-)
+# You can also use another webhook service.
+NOTIFY_WEBHOOK_URL = ""
 
 
-def get_adelaide_time():
-
+def now_adelaide():
+    """
+    Return the current time in Adelaide.
+    """
     return datetime.now(
         ZoneInfo("Australia/Adelaide")
     )
 
 
-def format_time(dt):
+def formatted_time(dt=None):
+    """
+    Return a human-readable Adelaide timestamp.
+    """
+    if dt is None:
+        dt = now_adelaide()
 
     return dt.strftime(
         "%A, %d %B %Y at %I:%M:%S %p"
     )
 
 
-def format_duration(seconds):
+def iso_time(dt=None):
+    """
+    Return a timestamp suitable for storing in state.json.
+    """
+    if dt is None:
+        dt = now_adelaide()
+
+    return dt.isoformat()
+
+
+def parse_time(value):
+    """
+    Convert a stored ISO timestamp back into a datetime.
+    """
+    if not value:
+        return None
+
+    try:
+        return datetime.fromisoformat(value)
+    except Exception:
+        return None
+
+
+def format_elapsed(seconds):
+    """
+    Convert seconds into a readable duration.
+    """
+
+    if seconds < 0:
+        seconds = 0
 
     seconds = int(seconds)
 
-    days, remainder = divmod(
-        seconds,
-        86400
-    )
+    days = seconds // 86400
+    seconds %= 86400
 
-    hours, remainder = divmod(
-        remainder,
-        3600
-    )
+    hours = seconds // 3600
+    seconds %= 3600
 
-    minutes, seconds = divmod(
-        remainder,
-        60
-    )
-
+    minutes = seconds // 60
+    seconds %= 60
 
     parts = []
 
-
     if days:
         parts.append(
-            f"{days} day"
-            + ("s" if days != 1 else "")
+            f"{days} day{'s' if days != 1 else ''}"
         )
-
 
     if hours:
         parts.append(
-            f"{hours} hour"
-            + ("s" if hours != 1 else "")
+            f"{hours} hour{'s' if hours != 1 else ''}"
         )
-
 
     if minutes:
         parts.append(
-            f"{minutes} minute"
-            + ("s" if minutes != 1 else "")
+            f"{minutes} minute{'s' if minutes != 1 else ''}"
         )
-
 
     if seconds or not parts:
-
         parts.append(
-            f"{seconds} second"
-            + ("s" if seconds != 1 else "")
+            f"{seconds} second{'s' if seconds != 1 else ''}"
         )
-
 
     return ", ".join(parts)
 
 
-def send_notification(
-    message,
-    title="Char Messages"
-):
-
+def send_notification(message):
     """
-    Send a push notification through ntfy.
+    Send a notification.
 
     If TESTING_MODE is True, nothing is sent.
     """
 
-    if (
-        TESTING_MODE
-        or not NOTIFY_WEBHOOK_URL
-    ):
+    if TESTING_MODE:
+        print(
+            "[TESTING MODE] Notification:"
+        )
+        print(message)
         return
 
+    if not NOTIFY_WEBHOOK_URL:
+        print(
+            "[WARNING] NOTIFY_WEBHOOK_URL is empty."
+        )
+        print(message)
+        return
 
     try:
 
         if "ntfy.sh" in NOTIFY_WEBHOOK_URL:
 
             response = requests.post(
-
                 NOTIFY_WEBHOOK_URL,
-
-                data=message.encode(
-                    "utf-8"
-                ),
-
+                data=message.encode("utf-8"),
                 headers={
-
-                    "Title":
-                        title,
-
-                    "Priority":
-                        "high",
-
-                    "Tags":
-                        "envelope"
-
+                    "Title": "Char Messages"
                 },
-
                 timeout=5
             )
-
-
-            print(
-                "Notification sent:",
-                response.status_code
-            )
-
 
         else:
 
             response = requests.post(
-
                 NOTIFY_WEBHOOK_URL,
-
                 json={
-
-                    "content":
-                        message,
-
-                    "text":
-                        message
-
+                    "content": message,
+                    "text": message
                 },
-
                 timeout=5
             )
 
-
-            print(
-                "Notification sent:",
-                response.status_code
-            )
-
+        print(
+            "Notification sent:",
+            response.status_code
+        )
 
     except Exception as e:
 
-        # A notification failure should
-        # NEVER break the website.
-
         print(
-            "Notification error:",
+            "[WARNING] Notification failed:",
             e
         )
 
 
-# ==========================================
+# ============================================================
 # CONFIGURATION
-# ==========================================
+# ============================================================
 
-SECURITY_QUESTION = (
-    "What is this guy's name?"
-)
+SECURITY_QUESTION = "What is this guy's name?"
 
-
-SECURITY_IMAGE_URL = (
-    "/static/lorentz.jpg"
-)
-
+SECURITY_IMAGE_URL = "/static/lorentz.jpg"
 
 ACCEPTED_ANSWERS = [
-
     "Lorentz",
-
     "lorentz"
-
 ]
 
 
-# ==========================================
+# ============================================================
 # INTRO MESSAGE
-# ==========================================
+# ============================================================
 
 INTRO_TITLE = "Hey Char"
-
 
 INTRO_MESSAGE = """
 
@@ -264,12 +223,11 @@ Obviously you can copy/paste the message, and do whatever you like, but it would
 """
 
 
-# ==========================================
+# ============================================================
 # "I CAN'T CHOOSE" POPUP
-# ==========================================
+# ============================================================
 
 INDECISION_TITLE = "Not sure?"
-
 
 INDECISION_MESSAGE = """
 That's okay. Here's a bit more context to help:
@@ -290,16 +248,11 @@ And if you genuinely don't want to read any of them, that's okay too.
 """
 
 
-# ==========================================
-# YOUR THREE MESSAGES
-# ==========================================
+# ============================================================
+# THREE MESSAGES
+# ============================================================
 
 MESSAGES = {
-
-
-    # ======================================
-    # MESSAGE 1 — HOW I FEEL
-    # ======================================
 
     "1": """
 Hey Char,
@@ -356,11 +309,6 @@ https://www.instagram.com/p/DZA_VRbCXVN/
 
 There is plenty more I can say, and would like to share with you, but I will leave it there for now. This is just the bare-bones “if we were to never speak again, I would want her to know” explanation. If you have any thoughts, want me to elaborate, or just simply want to hear from me, let me know.
 """,
-
-
-    # ======================================
-    # MESSAGE 2 — REFLECTION
-    # ======================================
 
     "2": """
 Hey Char,
@@ -460,11 +408,6 @@ https://www.instagram.com/p/DZA_VRbCXVN/
 There is plenty more I can say, and would like to share with you, but I will leave it there for now. This is just the bare-bones “if we were to never speak again, I would want her to know” explanation. If you have any thoughts, want me to elaborate, or just simply want to hear from me, let me know.
 """,
 
-
-    # ======================================
-    # MESSAGE 3 — CLOSURE
-    # ======================================
-
     "3": """
 Hey Char,
 
@@ -520,59 +463,73 @@ https://www.instagram.com/p/DZA_VRbCXVN/
 
 There is plenty more I can say, and would like to share with you, but I will leave it there for now. This is just the bare-bones “if we were to never speak again, I would want her to know” explanation. If you have any thoughts, want me to elaborate, or just simply want to hear from me, let me know.
 """
-
 }
 
 
-# ==========================================
+# ============================================================
 # STATE MANAGEMENT
-# ==========================================
+# ============================================================
 
 def get_state():
 
-    if os.path.exists(
-        STATE_FILE
-    ):
+    if os.path.exists(STATE_FILE):
 
         try:
 
             with open(
                 STATE_FILE,
-                "r"
+                "r",
+                encoding="utf-8"
             ) as f:
 
-                return json.load(f)
+                state = json.load(f)
 
-        except Exception:
+                # Make sure older state files still work.
+                state.setdefault(
+                    "chosen_option",
+                    None
+                )
 
-            pass
+                state.setdefault(
+                    "authenticated",
+                    False
+                )
 
+                state.setdefault(
+                    "first_visit_at",
+                    None
+                )
+
+                state.setdefault(
+                    "visit_count",
+                    0
+                )
+
+                return state
+
+        except Exception as e:
+
+            print(
+                "Could not read state:",
+                e
+            )
 
     return {
-
-        "chosen_option":
-            None,
-
-        "authenticated":
-            False,
-
-        "first_visit_time":
-            None
-
+        "chosen_option": None,
+        "authenticated": False,
+        "first_visit_at": None,
+        "visit_count": 0
     }
 
 
 def save_state(state):
 
-    temp_file = (
-        STATE_FILE +
-        ".tmp"
-    )
-
+    temp_file = STATE_FILE + ".tmp"
 
     with open(
         temp_file,
-        "w"
+        "w",
+        encoding="utf-8"
     ) as f:
 
         json.dump(
@@ -587,2596 +544,1564 @@ def save_state(state):
             f.fileno()
         )
 
-
     os.replace(
         temp_file,
         STATE_FILE
     )
 
 
-# ==========================================
-# HTML TEMPLATE
-# ==========================================
+# ============================================================
+# HTML
+# ============================================================
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <title>My Thoughts</title>
+<title>My Thoughts</title>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <style>
+<style>
 
-        :root {
+:root {
+    --bg-color: #f4f6f4;
+    --card-bg: #ffffff;
+    --text-main: #2c3531;
+    --text-muted: #65746b;
+    --accent-color: #e07a5f;
+    --accent-hover: #cc6b50;
+    --accent-active: #81b29a;
+    --locked-bg: #e2e8e4;
+    --locked-text: #94a39b;
+    --border-radius: 16px;
+}
 
-            --bg-color: #f4f6f4;
+* {
+    box-sizing: border-box;
+}
 
-            --card-bg: #ffffff;
+html {
+    height: 100%;
+}
 
-            --text-main: #2c3531;
+body {
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        sans-serif;
 
-            --text-muted: #65746b;
+    color: var(--text-main);
 
-            --accent-color: #e07a5f;
+    text-align: center;
 
-            --accent-hover: #cc6b50;
+    padding: 20px;
 
-            --accent-active: #81b29a;
+    margin: 0;
 
-            --locked-bg: #e2e8e4;
+    min-height: 100vh;
 
-            --locked-text: #94a39b;
+    background-color: var(--bg-color);
 
-            --border-radius: 16px;
+    position: relative;
 
-        }
+    overflow-x: hidden;
+}
 
+#particle-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    z-index: 0;
+}
 
-        * {
+.card {
+    position: relative;
+    z-index: 1;
 
-            box-sizing: border-box;
+    background-color: var(--card-bg);
 
-        }
+    padding: 35px 30px;
 
+    border-radius: var(--border-radius);
 
-        html {
+    max-width: 440px;
 
-            height: 100%;
+    width: 100%;
 
-        }
+    margin: 0 auto;
 
+    box-shadow:
+        0 10px 30px rgba(44, 53, 49, 0.06);
 
-        body {
+    border:
+        1px solid rgba(129, 178, 154, 0.2);
+}
 
-            font-family:
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                Roboto,
-                sans-serif;
+h2 {
+    margin-top: 0;
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+    color: var(--text-main);
+}
 
-            color:
-                var(--text-main);
+p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
 
-            text-align:
-                center;
+.question-image {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
 
-            padding:
-                20px;
+    border-radius:
+        calc(var(--border-radius) - 8px);
 
-            margin:
-                0;
+    margin-bottom: 15px;
 
-            min-height:
-                100vh;
+    border:
+        1px solid rgba(129, 178, 154, 0.2);
+}
 
-            background-color:
-                var(--bg-color);
+.input-group,
+.button-group {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
 
-            position:
-                relative;
+input[type="text"] {
+    width: 100%;
+    padding: 12px 14px;
 
-            overflow-x:
-                hidden;
+    font-size: 1rem;
 
-        }
+    border: 1px solid #cbd5e1;
 
+    border-radius:
+        calc(var(--border-radius) - 6px);
 
-        #particle-canvas {
+    background-color: #f8fafc;
 
-            position:
-                fixed;
+    color: var(--text-main);
 
-            top:
-                0;
+    outline: none;
+}
 
-            left:
-                0;
+input[type="text"]:focus {
+    border-color: var(--accent-color);
+}
 
-            width:
-                100%;
+button {
+    display: block;
 
-            height:
-                100%;
+    width: 100%;
 
-            display:
-                block;
+    padding: 14px;
 
-            z-index:
-                0;
+    font-size: 1rem;
 
-        }
+    font-weight: 600;
 
+    border: none;
 
-        .card {
+    border-radius:
+        calc(var(--border-radius) - 6px);
 
-            position:
-                relative;
+    cursor: pointer;
 
-            z-index:
-                1;
+    background-color: var(--accent-color);
 
-            background-color:
-                var(--card-bg);
+    color: #ffffff;
 
-            padding:
-                35px 30px;
+    transition:
+        background-color 0.2s,
+        transform 0.1s;
+}
 
-            border-radius:
-                var(--border-radius);
+button:hover:not(:disabled) {
+    background-color: var(--accent-hover);
+}
 
-            max-width:
-                440px;
+button:active:not(:disabled) {
+    transform: scale(0.98);
+}
 
-            width:
-                100%;
+button:disabled {
+    background-color: var(--locked-bg);
+    color: var(--locked-text);
+    cursor: not-allowed;
+}
 
-            margin:
-                0 auto;
+.envelope-btn {
+    display: flex;
 
-            box-shadow:
-                0 10px 30px
-                rgba(
-                    44,
-                    53,
-                    49,
-                    0.06
-                );
+    align-items: center;
 
-            border:
-                1px solid
-                rgba(
-                    129,
-                    178,
-                    154,
-                    0.2
-                );
+    justify-content: center;
 
-        }
+    gap: 10px;
 
+    width: 100%;
 
-        h2 {
+    padding: 14px;
 
-            margin-top:
-                0;
+    font-size: 1rem;
 
-            font-size:
-                1.6rem;
+    font-weight: 600;
 
-            letter-spacing:
-                -0.02em;
+    border: none;
 
-            color:
-                var(--text-main);
+    border-radius:
+        calc(var(--border-radius) - 6px);
 
-        }
+    cursor: pointer;
 
+    background-color: var(--accent-color);
 
-        p {
+    color: #ffffff;
+}
 
-            color:
-                var(--text-muted);
+.envelope-btn:hover:not(:disabled) {
+    background-color: var(--accent-hover);
+}
 
-            font-size:
-                0.95rem;
+.envelope-btn:disabled {
+    background-color: var(--locked-bg);
+    color: var(--locked-text);
+    cursor: not-allowed;
+}
 
-            line-height:
-                1.6;
+.envelope-btn svg {
+    flex-shrink: 0;
+}
 
-        }
+button.secondary {
+    background-color: transparent;
+    color: var(--text-muted);
+    border: 1px solid #cbd5e1;
+}
 
+button.secondary:hover:not(:disabled) {
+    background-color: #f1f5f2;
+}
 
-        .question-image {
 
-            width:
-                100%;
+/* ==========================================================
+   MESSAGE SCROLL AREA
 
-            max-height:
-                200px;
+   This is deliberately an independent scrolling container.
+   ========================================================== */
 
-            object-fit:
-                cover;
+#result {
+    margin-top: 25px;
 
-            border-radius:
-                calc(
-                    var(--border-radius)
-                    - 8px
-                );
+    padding: 20px;
 
-            margin-bottom:
-                15px;
+    background-color: #f7f9f7;
 
-            border:
-                1px solid
-                rgba(
-                    129,
-                    178,
-                    154,
-                    0.2
-                );
+    border-left:
+        4px solid var(--accent-active);
 
-        }
+    border-radius: 8px;
 
+    text-align: left;
 
-        .input-group,
-        .button-group {
+    word-break: break-word;
 
-            margin-top:
-                20px;
+    border-top:
+        1px solid rgba(129, 178, 154, 0.15);
 
-            display:
-                flex;
+    border-right:
+        1px solid rgba(129, 178, 154, 0.15);
 
-            flex-direction:
-                column;
+    border-bottom:
+        1px solid rgba(129, 178, 154, 0.15);
 
-            gap:
-                12px;
+    max-height: 60vh;
 
-        }
+    overflow-y: auto;
 
+    overscroll-behavior: contain;
 
-        input[type="text"] {
+    -webkit-overflow-scrolling: touch;
 
-            width:
-                100%;
+    scrollbar-width: thin;
+}
 
-            padding:
-                12px 14px;
+#result p {
+    color: var(--text-main);
 
-            font-size:
-                1rem;
+    line-height: 1.7;
 
-            border:
-                1px solid
-                #cbd5e1;
+    white-space: pre-wrap;
 
-            border-radius:
-                calc(
-                    var(--border-radius)
-                    - 6px
-                );
+    margin-top: 8px;
 
-            background-color:
-                #f8fafc;
+    margin-bottom: 0;
+}
 
-            color:
-                var(--text-main);
+#result::-webkit-scrollbar {
+    width: 8px;
+}
 
-            outline:
-                none;
+#result::-webkit-scrollbar-track {
+    background: transparent;
+}
 
-            transition:
-                border-color 0.2s;
+#result::-webkit-scrollbar-thumb {
+    background:
+        rgba(101, 116, 107, 0.35);
 
-        }
+    border-radius: 10px;
+}
 
+.hidden {
+    display: none !important;
+}
 
-        input[type="text"]:focus {
 
-            border-color:
-                var(--accent-color);
+/* ==========================================================
+   MODALS
+   ========================================================== */
 
-        }
+.modal-overlay {
+    position: fixed;
 
+    top: 0;
+    left: 0;
 
-        button {
+    width: 100%;
+    height: 100%;
 
-            display:
-                block;
+    background:
+        rgba(44, 53, 49, 0.55);
 
-            width:
-                100%;
+    display: flex;
 
-            padding:
-                14px;
+    justify-content: center;
 
-            font-size:
-                1rem;
+    align-items: center;
 
-            font-weight:
-                600;
+    z-index: 1000;
 
-            border:
-                none;
+    padding: 20px;
+}
 
-            border-radius:
-                calc(
-                    var(--border-radius)
-                    - 6px
-                );
+.modal-box {
+    background-color: var(--card-bg);
 
-            cursor:
-                pointer;
+    border-radius: var(--border-radius);
 
-            background-color:
-                var(--accent-color);
+    max-width: 440px;
 
-            color:
-                #ffffff;
+    width: 100%;
 
-            transition:
-                background-color 0.2s,
-                transform 0.1s;
+    max-height: 80vh;
 
-        }
+    display: flex;
 
+    flex-direction: column;
 
-        button:hover:not(:disabled) {
+    box-shadow:
+        0 10px 30px rgba(44, 53, 49, 0.2);
 
-            background-color:
-                var(--accent-hover);
+    border:
+        1px solid rgba(129, 178, 154, 0.2);
 
-        }
+    overflow: hidden;
+}
 
+.modal-header {
+    padding: 25px 25px 10px 25px;
+}
 
-        button:active:not(:disabled) {
+.modal-header h2 {
+    margin: 0;
+}
 
-            transform:
-                scale(0.98);
+.modal-body {
+    padding: 10px 25px;
 
-        }
+    overflow-y: auto;
 
+    text-align: left;
 
-        button:disabled {
+    color: var(--text-main);
 
-            background-color:
-                var(--locked-bg);
+    font-size: 0.95rem;
 
-            color:
-                var(--locked-text);
+    line-height: 1.7;
 
-            cursor:
-                not-allowed;
+    white-space: pre-wrap;
+}
 
-        }
+.modal-footer {
+    padding:
+        15px 25px 25px 25px;
 
+    display: flex;
 
-        .envelope-btn {
+    flex-direction: column;
 
-            display:
-                flex;
+    gap: 10px;
+}
 
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            gap:
-                10px;
-
-            width:
-                100%;
-
-            padding:
-                14px;
-
-            font-size:
-                1rem;
-
-            font-weight:
-                600;
-
-            border:
-                none;
-
-            border-radius:
-                calc(
-                    var(--border-radius)
-                    - 6px
-                );
-
-            cursor:
-                pointer;
-
-            background-color:
-                var(--accent-color);
-
-            color:
-                #ffffff;
-
-            transition:
-                background-color 0.2s,
-                transform 0.1s;
-
-        }
-
-
-        .envelope-btn:hover:not(:disabled) {
-
-            background-color:
-                var(--accent-hover);
-
-        }
-
-
-        .envelope-btn:active:not(:disabled) {
-
-            transform:
-                scale(0.98);
-
-        }
-
-
-        .envelope-btn:disabled {
-
-            background-color:
-                var(--locked-bg);
-
-            color:
-                var(--locked-text);
-
-            cursor:
-                not-allowed;
-
-        }
-
-
-        .envelope-btn svg {
-
-            flex-shrink:
-                0;
-
-        }
-
-
-        button.secondary {
-
-            background-color:
-                transparent;
-
-            color:
-                var(--text-muted);
-
-            border:
-                1px solid
-                #cbd5e1;
-
-        }
-
-
-        button.secondary:hover:not(:disabled) {
-
-            background-color:
-                #f1f5f2;
-
-        }
-
-
-        /* =====================================
-           MESSAGE SCROLLING
-        ====================================== */
-
-        #result {
-
-            margin-top:
-                25px;
-
-            padding:
-                20px;
-
-            background-color:
-                #f7f9f7;
-
-            border-left:
-                4px solid
-                var(--accent-active);
-
-            border-radius:
-                8px;
-
-            text-align:
-                left;
-
-            word-break:
-                break-word;
-
-            border-top:
-                1px solid
-                rgba(
-                    129,
-                    178,
-                    154,
-                    0.15
-                );
-
-            border-right:
-                1px solid
-                rgba(
-                    129,
-                    178,
-                    154,
-                    0.15
-                );
-
-            border-bottom:
-                1px solid
-                rgba(
-                    129,
-                    178,
-                    154,
-                    0.15
-                );
-
-            max-height:
-                60vh;
-
-            overflow-y:
-                auto;
-
-            overscroll-behavior:
-                contain;
-
-            -webkit-overflow-scrolling:
-                touch;
-
-        }
-
-
-        #result p {
-
-            color:
-                var(--text-main);
-
-            line-height:
-                1.7;
-
-            white-space:
-                pre-wrap;
-
-            margin-top:
-                8px;
-
-            margin-bottom:
-                0;
-
-        }
-
-
-        #result::-webkit-scrollbar {
-
-            width:
-                8px;
-
-        }
-
-
-        #result::-webkit-scrollbar-track {
-
-            background:
-                transparent;
-
-        }
-
-
-        #result::-webkit-scrollbar-thumb {
-
-            background:
-                rgba(
-                    101,
-                    116,
-                    107,
-                    0.35
-                );
-
-            border-radius:
-                10px;
-
-        }
-
-
-        #result::-webkit-scrollbar-thumb:hover {
-
-            background:
-                rgba(
-                    101,
-                    116,
-                    107,
-                    0.55
-                );
-
-        }
-
-
-        .hidden {
-
-            display:
-                none !important;
-
-        }
-
-
-        /* =====================================
-           MODALS
-        ====================================== */
-
-        .modal-overlay {
-
-            position:
-                fixed;
-
-            top:
-                0;
-
-            left:
-                0;
-
-            width:
-                100%;
-
-            height:
-                100%;
-
-            background:
-                rgba(
-                    44,
-                    53,
-                    49,
-                    0.55
-                );
-
-            display:
-                flex;
-
-            justify-content:
-                center;
-
-            align-items:
-                center;
-
-            z-index:
-                1000;
-
-            padding:
-                20px;
-
-        }
-
-
-        .modal-box {
-
-            background-color:
-                var(--card-bg);
-
-            border-radius:
-                var(--border-radius);
-
-            max-width:
-                440px;
-
-            width:
-                100%;
-
-            max-height:
-                80vh;
-
-            display:
-                flex;
-
-            flex-direction:
-                column;
-
-            box-shadow:
-                0 10px 30px
-                rgba(
-                    44,
-                    53,
-                    49,
-                    0.2
-                );
-
-            border:
-                1px solid
-                rgba(
-                    129,
-                    178,
-                    154,
-                    0.2
-                );
-
-            overflow:
-                hidden;
-
-        }
-
-
-        .modal-header {
-
-            padding:
-                25px 25px 10px 25px;
-
-        }
-
-
-        .modal-header h2 {
-
-            margin:
-                0;
-
-        }
-
-
-        .modal-body {
-
-            padding:
-                10px 25px;
-
-            overflow-y:
-                auto;
-
-            text-align:
-                left;
-
-            color:
-                var(--text-main);
-
-            font-size:
-                0.95rem;
-
-            line-height:
-                1.7;
-
-            white-space:
-                pre-wrap;
-
-        }
-
-
-        .modal-footer {
-
-            padding:
-                15px 25px 25px 25px;
-
-            display:
-                flex;
-
-            flex-direction:
-                column;
-
-            gap:
-                10px;
-
-        }
-
-    </style>
+</style>
 
 </head>
 
 
 <body>
 
-    <canvas
-        id="particle-canvas"
-    ></canvas>
+<canvas id="particle-canvas"></canvas>
 
 
-    <!-- ======================================
-         MAIN CARD
-    ======================================= -->
+<div class="card">
 
-    <div class="card">
-
-        <h2>
-            Choose Wisely
-        </h2>
+    <h2>Choose Wisely</h2>
 
 
-        <!-- SECURITY QUESTION -->
+    <!-- AUTHENTICATION -->
 
-        <div id="auth-section">
+    <div id="auth-section">
 
-            {% if image_url %}
+        {% if image_url %}
 
-            <img
-                src="{{ image_url }}"
-                alt="Security Question Hint"
-                class="question-image"
+        <img
+            src="{{ image_url }}"
+            alt="Security Question Hint"
+            class="question-image"
+        >
+
+        {% endif %}
+
+        <p id="question-label">
+            {{ question }}
+        </p>
+
+        <div class="input-group">
+
+            <input
+                type="text"
+                id="answer-input"
+                placeholder="Enter your answer..."
+                onkeypress="handleKeyPress(event)"
             >
 
-            {% endif %}
-
-
-            <p id="question-label">
-
-                {{ question }}
-
-            </p>
-
-
-            <div class="input-group">
-
-                <input
-                    type="text"
-                    id="answer-input"
-                    placeholder="Enter your answer..."
-                    onkeypress="handleKeyPress(event)"
-                >
-
-
-                <button
-                    onclick="playClick(); verifyAnswer()"
-                >
-
-                    Verify Answer
-
-                </button>
-
-            </div>
-
-
-            <p
-                id="error-msg"
-                style="
-                    color: var(--accent-color);
-                    font-size: 0.85rem;
-                    margin-top: 10px;
-                "
-                class="hidden"
-            >
-
-                Incorrect answer. Try again.
-
-            </p>
+            <button onclick="verifyAnswer()">
+                Verify Answer
+            </button>
 
         </div>
 
-
-        <!-- MESSAGE CHOICE -->
-
-        <div
-            id="choice-section"
+        <p
+            id="error-msg"
+            style="
+                color: var(--accent-color);
+                font-size: 0.85rem;
+                margin-top: 10px;
+            "
             class="hidden"
         >
+            Incorrect answer. Try again.
+        </p>
 
-            <p id="status">
-
-                Well done! You are free to
-                select a message now :)
-
-            </p>
+    </div>
 
 
-            <div class="button-group">
+    <!-- CHOICE -->
+
+    <div id="choice-section" class="hidden">
+
+        <p id="status">
+            Well done! You are free to select a message now :)
+        </p>
 
 
-                <!-- MESSAGE 1 -->
-
-                <button
-                    id="btn1"
-                    class="envelope-btn"
-                    onclick="playClick(); requestChoice('1')"
-                >
-
-                    <svg
-                        id="env-icon-1"
-                        width="28"
-                        height="20"
-                        viewBox="0 0 28 20"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-
-                        <rect
-                            x="1"
-                            y="1"
-                            width="26"
-                            height="18"
-                            rx="2"
-                            stroke="white"
-                            stroke-width="1.5"
-                        />
-
-                        <path
-                            d="M2 2L14 12L26 2"
-                            stroke="white"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
-
-                        <circle
-                            cx="20"
-                            cy="6"
-                            r="2.5"
-                            fill="white"
-                        />
-
-                    </svg>
-
-                    <span>
-                        Message 1
-                    </span>
-
-                </button>
-
-
-                <!-- MESSAGE 2 -->
-
-                <button
-                    id="btn2"
-                    class="envelope-btn"
-                    onclick="playClick(); requestChoice('2')"
-                >
-
-                    <svg
-                        id="env-icon-2"
-                        width="28"
-                        height="20"
-                        viewBox="0 0 28 20"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-
-                        <rect
-                            x="1"
-                            y="1"
-                            width="26"
-                            height="18"
-                            rx="2"
-                            stroke="white"
-                            stroke-width="1.5"
-                        />
-
-                        <path
-                            d="M2 2L14 12L26 2"
-                            stroke="white"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
-
-                        <circle
-                            cx="20"
-                            cy="6"
-                            r="2.5"
-                            fill="white"
-                        />
-
-                    </svg>
-
-                    <span>
-                        Message 2
-                    </span>
-
-                </button>
-
-
-                <!-- MESSAGE 3 -->
-
-                <button
-                    id="btn3"
-                    class="envelope-btn"
-                    onclick="playClick(); requestChoice('3')"
-                >
-
-                    <svg
-                        id="env-icon-3"
-                        width="28"
-                        height="20"
-                        viewBox="0 0 28 20"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-
-                        <rect
-                            x="1"
-                            y="1"
-                            width="26"
-                            height="18"
-                            rx="2"
-                            stroke="white"
-                            stroke-width="1.5"
-                        />
-
-                        <path
-                            d="M2 2L14 12L26 2"
-                            stroke="white"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
-
-                        <circle
-                            cx="20"
-                            cy="6"
-                            r="2.5"
-                            fill="white"
-                        />
-
-                    </svg>
-
-                    <span>
-                        Message 3
-                    </span>
-
-                </button>
-
-            </div>
-
-
-            <!-- INDECISION -->
+        <div class="button-group">
 
             <button
-                id="indecision-btn"
-                class="secondary"
-                style="margin-top: 12px;"
-                onclick="playClick(); showIndecision()"
+                id="btn1"
+                class="envelope-btn"
+                onclick="requestChoice('1')"
             >
-
-                I can't choose
-
+                <span>✉️</span>
+                <span>Message 1</span>
             </button>
 
 
-            <!-- RESULT -->
-
-            <div
-                id="result"
-                class="hidden"
-            ></div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ======================================
-         INTRO MODAL
-    ======================================= -->
-
-    <div
-        id="intro-modal"
-        class="modal-overlay hidden"
-    >
-
-        <div class="modal-box">
-
-            <div class="modal-header">
-
-                <h2>
-                    {{ intro_title }}
-                </h2>
-
-            </div>
-
-
-            <div
-                class="modal-body"
-                id="intro-body"
-            ></div>
-
-
-            <div class="modal-footer">
-
-                <button
-                    id="intro-continue-btn"
-                    onclick="playClick(); closeIntro()"
-                >
-
-                    I've read this
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ======================================
-         CONFIRMATION MODAL
-    ======================================= -->
-
-    <div
-        id="confirm-modal"
-        class="modal-overlay hidden"
-    >
-
-        <div class="modal-box">
-
-            <div class="modal-header">
-
-                <h2>
-                    Are you sure?
-                </h2>
-
-            </div>
-
-
-            <div class="modal-body">
-
-                <p style="margin:0;">
-
-                    Make sure this is the right one.
-
-                </p>
-
-            </div>
-
-
-            <div class="modal-footer">
-
-                <button
-                    id="confirm-yes-btn"
-                    onclick="playClick(); confirmChoice()"
-                    disabled
-                >
-
-                    Yes, I'm sure
-
-                </button>
-
-
-                <button
-                    class="secondary"
-                    onclick="playClick(); cancelChoice()"
-                >
-
-                    Wait, not yet
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ======================================
-         INDECISION MODAL
-    ======================================= -->
-
-    <div
-        id="indecision-modal"
-        class="modal-overlay hidden"
-    >
-
-        <div class="modal-box">
-
-            <div class="modal-header">
-
-                <h2>
-                    {{ indecision_title }}
-                </h2>
-
-            </div>
-
-
-            <div
-                class="modal-body"
-                style="white-space: pre-wrap;"
+            <button
+                id="btn2"
+                class="envelope-btn"
+                onclick="requestChoice('2')"
             >
+                <span>✉️</span>
+                <span>Message 2</span>
+            </button>
 
-                {{ indecision_message }}
 
-            </div>
+            <button
+                id="btn3"
+                class="envelope-btn"
+                onclick="requestChoice('3')"
+            >
+                <span>✉️</span>
+                <span>Message 3</span>
+            </button>
+
+        </div>
 
 
-            <div class="modal-footer">
+        <button
+            id="indecision-btn"
+            class="secondary"
+            style="margin-top: 12px;"
+            onclick="showIndecision()"
+        >
+            I can't choose
+        </button>
 
-                <button
-                    onclick="playClick(); closeIndecision()"
-                >
 
-                    Okay
+        <div
+            id="result"
+            class="hidden"
+        ></div>
 
-                </button>
+    </div>
 
-            </div>
+</div>
+
+
+<!-- INTRO MODAL -->
+
+<div
+    id="intro-modal"
+    class="modal-overlay hidden"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <h2>{{ intro_title }}</h2>
+        </div>
+
+        <div
+            class="modal-body"
+            id="intro-body"
+        ></div>
+
+        <div class="modal-footer">
+
+            <button
+                id="intro-continue-btn"
+                onclick="closeIntro()"
+            >
+                I've read this
+            </button>
 
         </div>
 
     </div>
 
-
-    <script>
-
-        // ==========================================
-        // INTERACTIVE PARTICLE FIELD
-        // ==========================================
-
-        (function() {
-
-            const canvas =
-                document.getElementById(
-                    'particle-canvas'
-                );
+</div>
 
 
-            if (!canvas) {
-                return;
-            }
+<!-- CONFIRMATION -->
+
+<div
+    id="confirm-modal"
+    class="modal-overlay hidden"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2>
+                Are you sure?
+            </h2>
+
+        </div>
+
+        <div class="modal-body">
+
+            <p style="margin:0;">
+                Make sure this is the right one.
+            </p>
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button
+                id="confirm-yes-btn"
+                onclick="confirmChoice()"
+                disabled
+            >
+                Yes, I'm sure
+            </button>
+
+            <button
+                class="secondary"
+                onclick="cancelChoice()"
+            >
+                Wait, not yet
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
 
-            const ctx =
-                canvas.getContext('2d');
+<!-- INDECISION -->
+
+<div
+    id="indecision-modal"
+    class="modal-overlay hidden"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2>
+                {{ indecision_title }}
+            </h2>
+
+        </div>
+
+        <div class="modal-body">
+            {{ indecision_message }}
+        </div>
+
+        <div class="modal-footer">
+
+            <button onclick="closeIndecision()">
+                Okay
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
 
-            if (!ctx) {
-                return;
-            }
+<script>
+
+/* ==========================================================
+   PARTICLES
+   ========================================================== */
+
+(function() {
+
+    const canvas =
+        document.getElementById(
+            "particle-canvas"
+        );
+
+    if (!canvas) return;
+
+    const ctx =
+        canvas.getContext("2d");
+
+    if (!ctx) return;
+
+    let width;
+    let height;
+    let particles = [];
+
+    const colors = [
+        "#81b29a",
+        "#e07a5f",
+        "#a8c4b4",
+        "#eba488"
+    ];
+
+    const mouse = {
+        x: -9999,
+        y: -9999,
+        active: false
+    };
 
 
-            let width;
-            let height;
-            let particles;
+    function resize() {
+
+        width =
+            canvas.width =
+            window.innerWidth;
+
+        height =
+            canvas.height =
+            window.innerHeight;
+    }
 
 
-            const colors = [
+    function initParticles() {
 
-                '#81b29a',
+        const count =
+            Math.min(
+                140,
+                Math.floor(
+                    (width * height) / 9000
+                )
+            );
 
-                '#e07a5f',
+        particles = [];
 
-                '#a8c4b4',
+        for (
+            let i = 0;
+            i < count;
+            i++
+        ) {
 
-                '#eba488'
+            particles.push({
 
-            ];
+                x:
+                    Math.random() * width,
 
+                y:
+                    Math.random() * height,
 
-            const mouse = {
+                vx:
+                    (Math.random() - 0.5) * 0.4,
 
-                x: -9999,
+                vy:
+                    (Math.random() - 0.5) * 0.4,
 
-                y: -9999,
+                r:
+                    Math.random() * 2.5 + 2,
 
-                active: false
-
-            };
-
-
-            function resize() {
-
-                width =
-                    canvas.width =
-                    window.innerWidth;
-
-
-                height =
-                    canvas.height =
-                    window.innerHeight;
-
-            }
-
-
-            function initParticles() {
-
-                const count =
-                    Math.min(
-
-                        140,
-
+                color:
+                    colors[
                         Math.floor(
-
-                            (
-                                width *
-                                height
-                            ) / 9000
-
+                            Math.random() *
+                            colors.length
                         )
+                    ]
+            });
+        }
+    }
 
+
+    function step() {
+
+        ctx.clearRect(
+            0,
+            0,
+            width,
+            height
+        );
+
+
+        for (const p of particles) {
+
+            p.x += p.vx;
+            p.y += p.vy;
+
+
+            if (p.x < -10)
+                p.x = width + 10;
+
+            if (p.x > width + 10)
+                p.x = -10;
+
+            if (p.y < -10)
+                p.y = height + 10;
+
+            if (p.y > height + 10)
+                p.y = -10;
+
+
+            if (mouse.active) {
+
+                const dx =
+                    p.x - mouse.x;
+
+                const dy =
+                    p.y - mouse.y;
+
+                const dist =
+                    Math.sqrt(
+                        dx * dx +
+                        dy * dy
                     );
 
+                const radius = 130;
 
-                particles = [];
-
-
-                for (
-                    let i = 0;
-                    i < count;
-                    i++
+                if (
+                    dist < radius &&
+                    dist > 0.01
                 ) {
 
-                    particles.push({
+                    const force =
+                        (1 - dist / radius)
+                        * 1.8;
 
-                        x:
-                            Math.random() *
-                            width,
+                    p.x +=
+                        (dx / dist) *
+                        force;
 
-                        y:
-                            Math.random() *
-                            height,
-
-                        vx:
-                            (
-                                Math.random()
-                                - 0.5
-                            ) * 0.4,
-
-                        vy:
-                            (
-                                Math.random()
-                                - 0.5
-                            ) * 0.4,
-
-                        r:
-                            Math.random()
-                            * 2.5 + 2,
-
-                        color:
-                            colors[
-                                Math.floor(
-                                    Math.random()
-                                    * colors.length
-                                )
-                            ]
-
-                    });
-
+                    p.y +=
+                        (dy / dist) *
+                        force;
                 }
-
             }
 
 
-            function step() {
+            ctx.beginPath();
 
-                ctx.clearRect(
-                    0,
-                    0,
-                    width,
-                    height
-                );
+            ctx.arc(
+                p.x,
+                p.y,
+                p.r,
+                0,
+                Math.PI * 2
+            );
 
+            ctx.fillStyle =
+                p.color;
 
-                for (
-                    let p of particles
-                ) {
+            ctx.globalAlpha =
+                0.8;
 
-                    p.x += p.vx;
-
-                    p.y += p.vy;
-
-
-                    if (p.x < -10)
-                        p.x =
-                            width + 10;
+            ctx.fill();
+        }
 
 
-                    if (
-                        p.x >
-                        width + 10
-                    )
-                        p.x = -10;
+        ctx.globalAlpha = 1;
 
 
-                    if (p.y < -10)
-                        p.y =
-                            height + 10;
+        for (
+            let i = 0;
+            i < particles.length;
+            i++
+        ) {
 
+            for (
+                let j = i + 1;
+                j < particles.length;
+                j++
+            ) {
 
-                    if (
-                        p.y >
-                        height + 10
-                    )
-                        p.y = -10;
+                const a =
+                    particles[i];
 
+                const b =
+                    particles[j];
 
-                    if (mouse.active) {
+                const dx =
+                    a.x - b.x;
 
-                        const dx =
-                            p.x -
-                            mouse.x;
+                const dy =
+                    a.y - b.y;
 
+                const dist =
+                    Math.sqrt(
+                        dx * dx +
+                        dy * dy
+                    );
 
-                        const dy =
-                            p.y -
-                            mouse.y;
-
-
-                        const dist =
-                            Math.sqrt(
-                                dx * dx +
-                                dy * dy
-                            );
-
-
-                        const radius = 130;
-
-
-                        if (
-                            dist <
-                                radius &&
-                            dist >
-                                0.01
-                        ) {
-
-                            const force =
-                                (
-                                    1 -
-                                    dist /
-                                    radius
-                                ) * 1.8;
-
-
-                            p.x +=
-                                (
-                                    dx /
-                                    dist
-                                ) * force;
-
-
-                            p.y +=
-                                (
-                                    dy /
-                                    dist
-                                ) * force;
-
-                        }
-
-                    }
-
+                if (dist < 130) {
 
                     ctx.beginPath();
 
-
-                    ctx.arc(
-
-                        p.x,
-
-                        p.y,
-
-                        p.r,
-
-                        0,
-
-                        Math.PI * 2
-
+                    ctx.moveTo(
+                        a.x,
+                        a.y
                     );
 
+                    ctx.lineTo(
+                        b.x,
+                        b.y
+                    );
 
-                    ctx.fillStyle =
-                        p.color;
+                    ctx.strokeStyle =
+                        "rgba(129, 178, 154, " +
+                        (
+                            0.35 *
+                            (1 - dist / 130)
+                        ) +
+                        ")";
 
+                    ctx.lineWidth = 1.2;
 
-                    ctx.globalAlpha =
-                        0.8;
-
-
-                    ctx.fill();
-
+                    ctx.stroke();
                 }
-
-
-                ctx.globalAlpha = 1;
-
-
-                for (
-                    let i = 0;
-                    i < particles.length;
-                    i++
-                ) {
-
-                    for (
-                        let j = i + 1;
-                        j < particles.length;
-                        j++
-                    ) {
-
-                        const a =
-                            particles[i];
-
-
-                        const b =
-                            particles[j];
-
-
-                        const dx =
-                            a.x -
-                            b.x;
-
-
-                        const dy =
-                            a.y -
-                            b.y;
-
-
-                        const dist =
-                            Math.sqrt(
-                                dx * dx +
-                                dy * dy
-                            );
-
-
-                        if (
-                            dist < 130
-                        ) {
-
-                            ctx.beginPath();
-
-
-                            ctx.moveTo(
-                                a.x,
-                                a.y
-                            );
-
-
-                            ctx.lineTo(
-                                b.x,
-                                b.y
-                            );
-
-
-                            ctx.strokeStyle =
-                                'rgba(129, 178, 154, ' +
-                                (
-                                    0.35 *
-                                    (
-                                        1 -
-                                        dist /
-                                        130
-                                    )
-                                ) +
-                                ')';
-
-
-                            ctx.lineWidth =
-                                1.2;
-
-
-                            ctx.stroke();
-
-                        }
-
-                    }
-
-                }
-
-
-                requestAnimationFrame(
-                    step
-                );
-
             }
+        }
 
 
-            window.addEventListener(
-                'resize',
-                () => {
-
-                    resize();
-
-                    initParticles();
-
-                }
-            );
+        requestAnimationFrame(step);
+    }
 
 
-            window.addEventListener(
-                'mousemove',
-                (e) => {
-
-                    mouse.x =
-                        e.clientX;
-
-                    mouse.y =
-                        e.clientY;
-
-                    mouse.active =
-                        true;
-
-                }
-            );
-
-
-            window.addEventListener(
-                'mouseleave',
-                () => {
-
-                    mouse.active =
-                        false;
-
-                }
-            );
-
-
-            window.addEventListener(
-                'touchmove',
-                (e) => {
-
-                    if (
-                        e.touches.length >
-                        0
-                    ) {
-
-                        mouse.x =
-                            e.touches[0]
-                                .clientX;
-
-                        mouse.y =
-                            e.touches[0]
-                                .clientY;
-
-                        mouse.active =
-                            true;
-
-                    }
-
-                },
-                {
-                    passive: true
-                }
-            );
-
-
-            window.addEventListener(
-                'touchend',
-                () => {
-
-                    mouse.active =
-                        false;
-
-                }
-            );
-
-
+    window.addEventListener(
+        "resize",
+        () => {
             resize();
-
             initParticles();
-
-            step();
-
-        })();
+        }
+    );
 
 
-        // ==========================================
-        // GLOBAL STATE
-        // ==========================================
+    window.addEventListener(
+        "mousemove",
+        e => {
 
-        let introShown = false;
+            mouse.x =
+                e.clientX;
 
-        let pendingChoice = null;
+            mouse.y =
+                e.clientY;
 
-
-        /*
-         * This is critical.
-         *
-         * checkState() runs every 3 seconds.
-         * We only render the message once.
-         *
-         * Otherwise the result box would be
-         * rebuilt every 3 seconds, sending its
-         * scrollbar back to the top.
-         */
-
-        let renderedChoice = null;
+            mouse.active = true;
+        }
+    );
 
 
-        // ==========================================
-        // SOUND EFFECT
-        // ==========================================
-
-        let audioCtx = null;
-
-
-        function playClick() {
-
-            try {
-
-                if (!audioCtx) {
-
-                    audioCtx =
-                        new (
-                            window.AudioContext ||
-                            window.webkitAudioContext
-                        )();
-
-                }
+    window.addEventListener(
+        "mouseleave",
+        () => {
+            mouse.active = false;
+        }
+    );
 
 
-                const osc =
-                    audioCtx.createOscillator();
+    window.addEventListener(
+        "touchmove",
+        e => {
 
+            if (e.touches.length > 0) {
 
-                const gain =
-                    audioCtx.createGain();
+                mouse.x =
+                    e.touches[0].clientX;
 
+                mouse.y =
+                    e.touches[0].clientY;
 
-                osc.type =
-                    'sine';
-
-
-                osc.frequency.setValueAtTime(
-
-                    520,
-
-                    audioCtx.currentTime
-
-                );
-
-
-                osc.frequency.exponentialRampToValueAtTime(
-
-                    280,
-
-                    audioCtx.currentTime +
-                    0.09
-
-                );
-
-
-                gain.gain.setValueAtTime(
-
-                    0.12,
-
-                    audioCtx.currentTime
-
-                );
-
-
-                gain.gain.exponentialRampToValueAtTime(
-
-                    0.001,
-
-                    audioCtx.currentTime +
-                    0.12
-
-                );
-
-
-                osc
-                    .connect(gain)
-                    .connect(
-                        audioCtx.destination
-                    );
-
-
-                osc.start();
-
-
-                osc.stop(
-
-                    audioCtx.currentTime +
-                    0.12
-
-                );
-
-            } catch (e) {
-
-                // Audio unavailable.
-
+                mouse.active = true;
             }
 
+        },
+        {
+            passive: true
         }
+    );
 
 
-        // ==========================================
-        // INTRO
-        // ==========================================
-
-        function typewriteIntro() {
-
-            const el =
-                document.getElementById(
-                    'intro-body'
-                );
-
-
-            const btn =
-                document.getElementById(
-                    'intro-continue-btn'
-                );
-
-
-            el.textContent =
-                {{ intro_message|tojson }};
-
-
-            btn.disabled =
-                false;
-
+    window.addEventListener(
+        "touchend",
+        () => {
+            mouse.active = false;
         }
+    );
 
 
-        function showIntroOrChoice() {
+    resize();
+    initParticles();
+    step();
 
-            if (!introShown) {
+})();
 
-                document
-                    .getElementById(
-                        'intro-modal'
-                    )
-                    .classList
-                    .remove(
-                        'hidden'
-                    );
 
+/* ==========================================================
+   GLOBAL STATE
+   ========================================================== */
 
-                typewriteIntro();
+let introShown = false;
 
-            } else {
+let pendingChoice = null;
 
-                document
-                    .getElementById(
-                        'choice-section'
-                    )
-                    .classList
-                    .remove(
-                        'hidden'
-                    );
+/*
+ * VERY IMPORTANT:
+ *
+ * This variable prevents checkState() from recreating
+ * the message every three seconds.
+ *
+ * Recreating the message was what caused the scrollbar
+ * to jump back to the top.
+ */
+let renderedChoice = null;
 
-            }
 
-        }
+/* ==========================================================
+   INTRO
+   ========================================================== */
 
+function typewriteIntro() {
 
-        function closeIntro() {
-
-            introShown =
-                true;
-
-
-            document
-                .getElementById(
-                    'intro-modal'
-                )
-                .classList
-                .add(
-                    'hidden'
-                );
-
-
-            document
-                .getElementById(
-                    'choice-section'
-                )
-                .classList
-                .remove(
-                    'hidden'
-                );
-
-        }
-
-
-        // ==========================================
-        // INDECISION
-        // ==========================================
-
-        function showIndecision() {
-
-            document
-                .getElementById(
-                    'indecision-modal'
-                )
-                .classList
-                .remove(
-                    'hidden'
-                );
-
-        }
-
-
-        function closeIndecision() {
-
-            document
-                .getElementById(
-                    'indecision-modal'
-                )
-                .classList
-                .add(
-                    'hidden'
-                );
-
-        }
-
-
-        // ==========================================
-        // AUTHENTICATION
-        // ==========================================
-
-        async function verifyAnswer() {
-
-            let answer =
-                document
-                    .getElementById(
-                        'answer-input'
-                    )
-                    .value;
-
-
-            try {
-
-                let res =
-                    await fetch(
-
-                        '/verify',
-
-                        {
-
-                            method:
-                                'POST',
-
-                            headers: {
-
-                                'Content-Type':
-                                    'application/json'
-
-                            },
-
-                            body:
-                                JSON.stringify({
-
-                                    answer:
-                                        answer
-
-                                })
-
-                        }
-
-                    );
-
-
-                let data =
-                    await res.json();
-
-
-                if (data.success) {
-
-                    document
-                        .getElementById(
-                            'auth-section'
-                        )
-                        .classList
-                        .add(
-                            'hidden'
-                        );
-
-
-                    showIntroOrChoice();
-
-                } else {
-
-                    let err =
-                        document
-                            .getElementById(
-                                'error-msg'
-                            );
-
-
-                    err
-                        .classList
-                        .remove(
-                            'hidden'
-                        );
-
-
-                    document
-                        .getElementById(
-                            'answer-input'
-                        )
-                        .value =
-                        "";
-
-                }
-
-            } catch (e) {
-
-                console.error(e);
-
-            }
-
-        }
-
-
-        function handleKeyPress(e) {
-
-            if (
-                e.key === 'Enter'
-            ) {
-
-                verifyAnswer();
-
-            }
-
-        }
-
-
-        // ==========================================
-        // CHOICE REQUEST
-        // ==========================================
-
-        function requestChoice(option) {
-
-            pendingChoice =
-                option;
-
-
-            const yesBtn =
-                document
-                    .getElementById(
-                        'confirm-yes-btn'
-                    );
-
-
-            yesBtn.disabled =
-                true;
-
-
-            document
-                .getElementById(
-                    'confirm-modal'
-                )
-                .classList
-                .remove(
-                    'hidden'
-                );
-
-
-            let secondsLeft =
-                5;
-
-
-            yesBtn.innerText =
-                `Yes, I'm sure (${secondsLeft})`;
-
-
-            const countdown =
-                setInterval(
-
-                    () => {
-
-                        secondsLeft -= 1;
-
-
-                        if (
-                            secondsLeft > 0
-                        ) {
-
-                            yesBtn.innerText =
-                                `Yes, I'm sure (${secondsLeft})`;
-
-                        } else {
-
-                            clearInterval(
-                                countdown
-                            );
-
-
-                            yesBtn.innerText =
-                                "Yes, I'm sure";
-
-
-                            yesBtn.disabled =
-                                false;
-
-                        }
-
-                    },
-
-                    1000
-
-                );
-
-        }
-
-
-        function cancelChoice() {
-
-            pendingChoice =
-                null;
-
-
-            document
-                .getElementById(
-                    'confirm-yes-btn'
-                )
-                .innerText =
-                "Yes, I'm sure";
-
-
-            document
-                .getElementById(
-                    'confirm-modal'
-                )
-                .classList
-                .add(
-                    'hidden'
-                );
-
-        }
-
-
-        // ==========================================
-        // CONFIRM CHOICE
-        // ==========================================
-
-        async function confirmChoice() {
-
-            if (
-                !pendingChoice
-            )
-                return;
-
-
-            const option =
-                pendingChoice;
-
-
-            document
-                .getElementById(
-                    'confirm-modal'
-                )
-                .classList
-                .add(
-                    'hidden'
-                );
-
-
-            try {
-
-                let res =
-                    await fetch(
-
-                        '/choose',
-
-                        {
-
-                            method:
-                                'POST',
-
-                            headers: {
-
-                                'Content-Type':
-                                    'application/json'
-
-                            },
-
-                            body:
-                                JSON.stringify({
-
-                                    choice:
-                                        option
-
-                                })
-
-                        }
-
-                    );
-
-
-                let data =
-                    await res.json();
-
-
-                if (data.success) {
-
-                    applyLock(
-
-                        option,
-
-                        data.message
-
-                    );
-
-                } else {
-
-                    alert(
-                        data.error
-                    );
-
-
-                    checkState();
-
-                }
-
-            } catch (e) {
-
-                alert(
-                    "Network error. Please try again."
-                );
-
-
-                checkState();
-
-            }
-
-
-            pendingChoice =
-                null;
-
-        }
-
-
-        // ==========================================
-        // APPLY PERMANENT LOCK
-        // ==========================================
-
-        function applyLock(
-            chosen,
-            msg
-        ) {
-
-            const alreadyRendered =
-                renderedChoice === chosen;
-
-
-            document
-                .getElementById(
-                    'indecision-btn'
-                )
-                .classList
-                .add(
-                    'hidden'
-                );
-
-
-            document
-                .querySelectorAll(
-                    '#choice-section .envelope-btn'
-                )
-                .forEach(
-
-                    (b, index) => {
-
-                        b.disabled =
-                            true;
-
-
-                        const num =
-                            index + 1;
-
-
-                        const label =
-                            b.querySelector(
-                                'span'
-                            );
-
-
-                        const icon =
-                            b.querySelector(
-                                'svg'
-                            );
-
-
-                        if (
-                            num.toString()
-                            === chosen
-                        ) {
-
-                            b.style.backgroundColor =
-                                "var(--accent-active)";
-
-
-                            label.textContent =
-                                `Message ${chosen} (Opened)`;
-
-
-                            icon.innerHTML = `
-
-                                <path
-                                    d="M2 6L14 14L26 6"
-                                    stroke="white"
-                                    stroke-width="1.5"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    fill="none"
-                                />
-
-                                <rect
-                                    x="6"
-                                    y="1"
-                                    width="16"
-                                    height="12"
-                                    rx="1"
-                                    stroke="white"
-                                    stroke-width="1.5"
-                                    fill="none"
-                                />
-
-                                <rect
-                                    x="1"
-                                    y="6"
-                                    width="26"
-                                    height="13"
-                                    rx="2"
-                                    stroke="white"
-                                    stroke-width="1.5"
-                                    fill="none"
-                                />
-
-                            `;
-
-
-                        } else {
-
-                            label.textContent =
-                                `Message ${num} (Locked)`;
-
-
-                            icon.innerHTML = `
-
-                                <rect
-                                    x="1"
-                                    y="1"
-                                    width="26"
-                                    height="18"
-                                    rx="2"
-                                    stroke="currentColor"
-                                    stroke-width="1.5"
-                                    fill="none"
-                                />
-
-                                <path
-                                    d="M2 2L14 12L26 2"
-                                    stroke="currentColor"
-                                    stroke-width="1.5"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    fill="none"
-                                />
-
-                                <circle
-                                    cx="20"
-                                    cy="6"
-                                    r="2.5"
-                                    fill="currentColor"
-                                />
-
-                            `;
-
-                        }
-
-                    }
-
-                );
-
-
-            document
-                .getElementById(
-                    'status'
-                )
-                .innerText =
-                "Choice permanently registered on server. Other options are locked.";
-
-
-            /*
-             * Do NOT rebuild the message if it
-             * has already been rendered.
-             *
-             * This prevents the scrollbar from
-             * jumping to the top every 3 seconds.
-             */
-
-            if (
-                alreadyRendered
-            ) {
-
-                return;
-
-            }
-
-
-            renderedChoice =
-                chosen;
-
-
-            let resBox =
-                document.getElementById(
-                    'result'
-                );
-
-
-            resBox.classList.remove(
-                'hidden'
-            );
-
-
-            resBox.innerHTML =
-                "";
-
-
-            const heading =
-                document.createElement(
-                    'strong'
-                );
-
-
-            heading.style.color =
-                "var(--accent-color)";
-
-
-            heading.textContent =
-                "Message " +
-                chosen +
-                ":";
-
-
-            const message =
-                document.createElement(
-                    'p'
-                );
-
-
-            message.style.marginTop =
-                "8px";
-
-
-            message.style.color =
-                "var(--text-main)";
-
-
-            message.style.whiteSpace =
-                "pre-wrap";
-
-
-            message.textContent =
-                msg;
-
-
-            resBox.appendChild(
-                heading
-            );
-
-
-            resBox.appendChild(
-                message
-            );
-
-        }
-
-
-        // ==========================================
-        // CHECK SERVER STATE
-        // ==========================================
-
-        async function checkState() {
-
-            try {
-
-                let res =
-                    await fetch(
-
-                        '/status?' +
-                        new Date().getTime()
-
-                    );
-
-
-                let data =
-                    await res.json();
-
-
-                if (
-                    data.chosen_option
-                ) {
-
-                    document
-                        .getElementById(
-                            'auth-section'
-                        )
-                        .classList
-                        .add(
-                            'hidden'
-                        );
-
-
-                    document
-                        .getElementById(
-                            'intro-modal'
-                        )
-                        .classList
-                        .add(
-                            'hidden'
-                        );
-
-
-                    document
-                        .getElementById(
-                            'confirm-modal'
-                        )
-                        .classList
-                        .add(
-                            'hidden'
-                        );
-
-
-                    document
-                        .getElementById(
-                            'indecision-modal'
-                        )
-                        .classList
-                        .add(
-                            'hidden'
-                        );
-
-
-                    document
-                        .getElementById(
-                            'choice-section'
-                        )
-                        .classList
-                        .remove(
-                            'hidden'
-                        );
-
-
-                    applyLock(
-
-                        data.chosen_option,
-
-                        data.message
-
-                    );
-
-
-                } else if (
-                    data.authenticated
-                ) {
-
-                    document
-                        .getElementById(
-                            'auth-section'
-                        )
-                        .classList
-                        .add(
-                            'hidden'
-                        );
-
-
-                    showIntroOrChoice();
-
-                }
-
-            } catch (e) {
-
-                console.error(e);
-
-            }
-
-        }
-
-
-        // ==========================================
-        // INITIAL STATE
-        // ==========================================
-
-        checkState();
-
-
-        // ==========================================
-        // PERIODIC STATE CHECK
-        // ==========================================
-
-        setInterval(
-
-            checkState,
-
-            3000
-
+    const el =
+        document.getElementById(
+            "intro-body"
         );
 
-    </script>
+    el.textContent =
+        {{ intro_message|tojson }};
+}
+
+
+function showIntroOrChoice() {
+
+    if (!introShown) {
+
+        document
+            .getElementById("intro-modal")
+            .classList
+            .remove("hidden");
+
+        typewriteIntro();
+
+    } else {
+
+        document
+            .getElementById("choice-section")
+            .classList
+            .remove("hidden");
+    }
+}
+
+
+function closeIntro() {
+
+    introShown = true;
+
+    document
+        .getElementById("intro-modal")
+        .classList
+        .add("hidden");
+
+    document
+        .getElementById("choice-section")
+        .classList
+        .remove("hidden");
+}
+
+
+/* ==========================================================
+   INDECISION
+   ========================================================== */
+
+function showIndecision() {
+
+    document
+        .getElementById("indecision-modal")
+        .classList
+        .remove("hidden");
+}
+
+
+function closeIndecision() {
+
+    document
+        .getElementById("indecision-modal")
+        .classList
+        .add("hidden");
+}
+
+
+/* ==========================================================
+   AUTHENTICATION
+   ========================================================== */
+
+async function verifyAnswer() {
+
+    const input =
+        document.getElementById(
+            "answer-input"
+        );
+
+    const answer =
+        input.value;
+
+
+    try {
+
+        const res =
+            await fetch(
+                "/verify",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            answer: answer
+                        })
+                }
+            );
+
+
+        const data =
+            await res.json();
+
+
+        if (data.success) {
+
+            document
+                .getElementById(
+                    "auth-section"
+                )
+                .classList
+                .add("hidden");
+
+            showIntroOrChoice();
+
+        } else {
+
+            document
+                .getElementById(
+                    "error-msg"
+                )
+                .classList
+                .remove("hidden");
+
+            input.value = "";
+        }
+
+    } catch (e) {
+
+        console.error(e);
+
+    }
+}
+
+
+function handleKeyPress(e) {
+
+    if (e.key === "Enter") {
+
+        verifyAnswer();
+
+    }
+}
+
+
+/* ==========================================================
+   CHOICE
+   ========================================================== */
+
+function requestChoice(option) {
+
+    pendingChoice = option;
+
+
+    const yesBtn =
+        document.getElementById(
+            "confirm-yes-btn"
+        );
+
+
+    yesBtn.disabled = true;
+
+
+    document
+        .getElementById(
+            "confirm-modal"
+        )
+        .classList
+        .remove("hidden");
+
+
+    let secondsLeft = 5;
+
+
+    yesBtn.innerText =
+        `Yes, I'm sure (${secondsLeft})`;
+
+
+    const countdown =
+        setInterval(
+            () => {
+
+                secondsLeft -= 1;
+
+
+                if (secondsLeft > 0) {
+
+                    yesBtn.innerText =
+                        `Yes, I'm sure (${secondsLeft})`;
+
+                } else {
+
+                    clearInterval(
+                        countdown
+                    );
+
+                    yesBtn.innerText =
+                        "Yes, I'm sure";
+
+                    yesBtn.disabled =
+                        false;
+                }
+
+            },
+            1000
+        );
+}
+
+
+function cancelChoice() {
+
+    pendingChoice = null;
+
+    document
+        .getElementById(
+            "confirm-yes-btn"
+        )
+        .innerText =
+        "Yes, I'm sure";
+
+    document
+        .getElementById(
+            "confirm-modal"
+        )
+        .classList
+        .add("hidden");
+}
+
+
+/* ==========================================================
+   CONFIRM CHOICE
+   ========================================================== */
+
+async function confirmChoice() {
+
+    if (!pendingChoice)
+        return;
+
+
+    const option =
+        pendingChoice;
+
+
+    document
+        .getElementById(
+            "confirm-modal"
+        )
+        .classList
+        .add("hidden");
+
+
+    try {
+
+        const res =
+            await fetch(
+                "/choose",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            choice: option
+                        })
+                }
+            );
+
+
+        const data =
+            await res.json();
+
+
+        if (data.success) {
+
+            applyLock(
+                option,
+                data.message
+            );
+
+        } else {
+
+            alert(data.error);
+
+            checkState();
+        }
+
+    } catch (e) {
+
+        alert(
+            "Network error. Please try again."
+        );
+
+        checkState();
+    }
+
+
+    pendingChoice = null;
+}
+
+
+/* ==========================================================
+   LOCK + DISPLAY MESSAGE
+   ========================================================== */
+
+function applyLock(chosen, msg) {
+
+    /*
+     * Hide indecision button.
+     */
+
+    document
+        .getElementById(
+            "indecision-btn"
+        )
+        .classList
+        .add("hidden");
+
+
+    /*
+     * Lock all buttons.
+     */
+
+    document
+        .querySelectorAll(
+            "#choice-section .envelope-btn"
+        )
+        .forEach(
+            (button, index) => {
+
+                button.disabled = true;
+
+                const number =
+                    String(index + 1);
+
+                const label =
+                    button.querySelectorAll(
+                        "span"
+                    )[1];
+
+
+                if (number === chosen) {
+
+                    button.style.backgroundColor =
+                        "var(--accent-active)";
+
+                    label.textContent =
+                        `Message ${chosen} (Opened)`;
+
+                } else {
+
+                    label.textContent =
+                        `Message ${number} (Locked)`;
+                }
+            }
+        );
+
+
+    document
+        .getElementById("status")
+        .innerText =
+        "Choice permanently registered on server. Other options are locked.";
+
+
+    /*
+     * ======================================================
+     * CRITICAL SCROLL FIX
+     * ======================================================
+     *
+     * If this message has already been rendered, DO NOTHING.
+     *
+     * checkState() runs every 3 seconds.
+     * Previously it was rebuilding #result every time.
+     * That reset scrollTop to 0.
+     *
+     * Now the DOM is only constructed once.
+     */
+
+    if (renderedChoice === chosen) {
+        return;
+    }
+
+
+    renderedChoice = chosen;
+
+
+    const resBox =
+        document.getElementById(
+            "result"
+        );
+
+
+    resBox.classList.remove(
+        "hidden"
+    );
+
+
+    resBox.innerHTML = "";
+
+
+    const heading =
+        document.createElement(
+            "strong"
+        );
+
+
+    heading.style.color =
+        "var(--accent-color)";
+
+    heading.textContent =
+        "Message " + chosen + ":";
+
+
+    const message =
+        document.createElement(
+            "p"
+        );
+
+
+    message.textContent =
+        msg;
+
+
+    resBox.appendChild(
+        heading
+    );
+
+    resBox.appendChild(
+        message
+    );
+}
+
+
+/* ==========================================================
+   SERVER STATE
+   ========================================================== */
+
+async function checkState() {
+
+    try {
+
+        const res =
+            await fetch(
+                "/status?" +
+                Date.now()
+            );
+
+
+        const data =
+            await res.json();
+
+
+        if (data.chosen_option) {
+
+            document
+                .getElementById(
+                    "auth-section"
+                )
+                .classList
+                .add("hidden");
+
+
+            document
+                .getElementById(
+                    "intro-modal"
+                )
+                .classList
+                .add("hidden");
+
+
+            document
+                .getElementById(
+                    "confirm-modal"
+                )
+                .classList
+                .add("hidden");
+
+
+            document
+                .getElementById(
+                    "indecision-modal"
+                )
+                .classList
+                .add("hidden");
+
+
+            document
+                .getElementById(
+                    "choice-section"
+                )
+                .classList
+                .remove("hidden");
+
+
+            applyLock(
+                data.chosen_option,
+                data.message
+            );
+
+
+        } else if (
+            data.authenticated
+        ) {
+
+            document
+                .getElementById(
+                    "auth-section"
+                )
+                .classList
+                .add("hidden");
+
+            showIntroOrChoice();
+        }
+
+    } catch (e) {
+
+        console.error(e);
+
+    }
+}
+
+
+/*
+ * Initial state check.
+ */
+
+checkState();
+
+
+/*
+ * Poll server state every 3 seconds.
+ *
+ * IMPORTANT:
+ * This does NOT generate notifications.
+ *
+ * Only visiting "/" generates a visit notification.
+ */
+
+setInterval(
+    checkState,
+    3000
+);
+
+</script>
 
 </body>
 
@@ -3184,54 +2109,99 @@ HTML_TEMPLATE = """
 """
 
 
-# ==========================================
+# ============================================================
 # ROUTES
-# ==========================================
+# ============================================================
 
-@app.route('/')
+@app.route("/")
 def home():
 
-    state =
-        get_state()
+    state = get_state()
+
+    current_time = now_adelaide()
+
+    first_visit = parse_time(
+        state.get(
+            "first_visit_at"
+        )
+    )
 
 
-    # ======================================
+    # ========================================================
     # RECORD FIRST VISIT
-    # ======================================
+    # ========================================================
 
-    if not state.get(
-        "first_visit_time"
-    ):
+    if first_visit is None:
 
-        now =
-            get_adelaide_time()
+        first_visit = current_time
+
+        state["first_visit_at"] = iso_time(current_time)
+
+    # NOTE:
+    # The line above intentionally needs to be written as:
+    #
+    # state["first_visit_at"] = iso_time(current_time)
+    #
+    # It is kept separate below to make the syntax unambiguous.
 
 
-        state[
-            "first_visit_time"
-        ] =
-            now.isoformat()
+    state["first_visit_at"] = iso_time(
+        first_visit
+    )
 
 
-        save_state(
-            state
+    # ========================================================
+    # INCREMENT VISIT COUNT
+    # ========================================================
+
+    state["visit_count"] = (
+        state.get(
+            "visit_count",
+            0
+        ) + 1
+    )
+
+
+    save_state(state)
+
+
+    visit_number = state["visit_count"]
+
+
+    elapsed = (
+        current_time -
+        first_visit
+    ).total_seconds()
+
+
+    # ========================================================
+    # NOTIFY EVERY TIME "/" IS VISITED
+    # ========================================================
+
+    if visit_number == 1:
+
+        visit_message = (
+            "🔗 CHAR MESSAGES — FIRST VISIT\n\n"
+            f"Time: {formatted_time(current_time)}\n"
+            f"Visit number: {visit_number}\n\n"
+            "The link has been opened for the first time."
+        )
+
+    else:
+
+        visit_message = (
+            "🔗 CHAR MESSAGES — LINK VISITED\n\n"
+            f"Time: {formatted_time(current_time)}\n"
+            f"Visit number: {visit_number}\n"
+            f"Time since first visit: "
+            f"{format_elapsed(elapsed)}\n\n"
+            "The link has been opened again."
         )
 
 
-        # ==================================
-        # NOTIFY LINK VISIT
-        # ==================================
-
-        send_notification(
-
-            "🔗 The link has been visited.\n\n"
-            f"Time: {format_time(now)}\n"
-            "Timezone: Adelaide (ACST/ACDT)",
-
-            title=
-                "Char opened the link"
-
-        )
+    send_notification(
+        visit_message
+    )
 
 
     return render_template_string(
@@ -3255,31 +2225,27 @@ def home():
 
         indecision_message=
             INDECISION_MESSAGE
-
     )
 
 
+# ============================================================
+# STATUS
+# ============================================================
+
 @app.route(
-    '/status',
-    methods=['GET']
+    "/status",
+    methods=["GET"]
 )
 def status():
 
-    state =
-        get_state()
+    state = get_state()
 
+    chosen = state.get("chosen_option")
 
-    chosen =
-        state.get(
-            "chosen_option"
-        )
-
-
-    authenticated =
-        state.get(
-            "authenticated",
-            False
-        )
+    authenticated = state.get(
+        "authenticated",
+        False
+    )
 
 
     if chosen:
@@ -3294,7 +2260,6 @@ def status():
 
             "authenticated":
                 True
-
         })
 
 
@@ -3305,18 +2270,23 @@ def status():
 
         "authenticated":
             authenticated
-
     })
 
 
+# ============================================================
+# VERIFY
+# ============================================================
+
 @app.route(
-    '/verify',
-    methods=['POST']
+    "/verify",
+    methods=["POST"]
 )
 def verify():
 
     req_data =
-        request.get_json()
+        request.get_json(
+            silent=True
+        ) or {}
 
 
     user_answer =
@@ -3326,49 +2296,40 @@ def verify():
         ).strip().lower()
 
 
-    if user_answer in [
+    accepted =
+        [
+            answer.lower()
+            for answer in ACCEPTED_ANSWERS
+        ]
 
-        answer.lower()
 
-        for answer
-        in ACCEPTED_ANSWERS
-
-    ]:
+    if user_answer in accepted:
 
         state =
             get_state()
 
+        state["authenticated"] = True
 
-        state[
-            "authenticated"
-        ] =
-            True
-
-
-        save_state(
-            state
-        )
+        save_state(state)
 
 
         return jsonify({
-
-            "success":
-                True
-
+            "success": True
         })
 
 
     return jsonify({
-
-        "success":
-            False
-
+        "success": False
     }), 400
 
 
+# ============================================================
+# CHOOSE
+# ============================================================
+
 @app.route(
-    '/choose',
-    methods=['POST']
+    "/choose",
+    methods=["POST"]
 )
 def choose():
 
@@ -3376,9 +2337,9 @@ def choose():
         get_state()
 
 
-    # ======================================
-    # MUST AUTHENTICATE
-    # ======================================
+    # --------------------------------------------------------
+    # AUTHENTICATION
+    # --------------------------------------------------------
 
     if not state.get(
         "authenticated",
@@ -3387,8 +2348,7 @@ def choose():
 
         return jsonify({
 
-            "success":
-                False,
+            "success": False,
 
             "error":
                 "Not authenticated!"
@@ -3396,9 +2356,9 @@ def choose():
         }), 403
 
 
-    # ======================================
-    # CHOICE ALREADY MADE
-    # ======================================
+    # --------------------------------------------------------
+    # PREVENT SECOND CHOICE
+    # --------------------------------------------------------
 
     if state.get(
         "chosen_option"
@@ -3406,8 +2366,7 @@ def choose():
 
         return jsonify({
 
-            "success":
-                False,
+            "success": False,
 
             "error":
                 "A choice has already been made and locked!"
@@ -3416,156 +2375,121 @@ def choose():
 
 
     req_data =
-        request.get_json()
+        request.get_json(
+            silent=True
+        ) or {}
 
 
     choice =
         str(
             req_data.get(
-                "choice"
+                "choice",
+                ""
             )
         )
 
 
-    # ======================================
+    # --------------------------------------------------------
     # VALID CHOICE
-    # ======================================
+    # --------------------------------------------------------
 
-    if choice in MESSAGES:
-
-        # ==================================
-        # GET CHOICE TIME
-        # ==================================
-
-        choice_time =
-            get_adelaide_time()
-
-
-        # ==================================
-        # CALCULATE TIME SINCE FIRST VISIT
-        # ==================================
-
-        first_visit_time =
-            state.get(
-                "first_visit_time"
-            )
-
-
-        elapsed_seconds =
-            None
-
-
-        elapsed_display =
-            "Unknown"
-
-
-        if first_visit_time:
-
-            try:
-
-                first_visit =
-                    datetime.fromisoformat(
-                        first_visit_time
-                    )
-
-
-                elapsed_seconds =
-                    (
-                        choice_time -
-                        first_visit
-                    ).total_seconds()
-
-
-                elapsed_display =
-                    format_duration(
-                        elapsed_seconds
-                    )
-
-            except Exception as e:
-
-                print(
-                    "Could not calculate "
-                    "elapsed time:",
-                    e
-                )
-
-
-        # ==================================
-        # SAVE CHOICE
-        # ==================================
-
-        state[
-            "chosen_option"
-        ] =
-            choice
-
-
-        state[
-            "choice_time"
-        ] =
-            choice_time.isoformat()
-
-
-        state[
-            "elapsed_seconds"
-        ] =
-            elapsed_seconds
-
-
-        save_state(
-            state
-        )
-
-
-        # ==================================
-        # SEND NOTIFICATION
-        # ==================================
-
-        send_notification(
-
-            f"💌 Char opened Message {choice}\n\n"
-
-            f"Time: "
-            f"{format_time(choice_time)}\n"
-
-            f"Time since link was first visited: "
-            f"{elapsed_display}\n"
-
-            "Timezone: Adelaide (ACST/ACDT)",
-
-            title=
-                "Char chose a message"
-
-        )
-
+    if choice not in MESSAGES:
 
         return jsonify({
 
-            "success":
-                True,
+            "success": False,
 
-            "message":
-                MESSAGES[choice]
+            "error":
+                "Invalid choice"
 
-        })
+        }), 400
+
+
+    # --------------------------------------------------------
+    # RECORD CHOICE
+    # --------------------------------------------------------
+
+    current_time =
+        now_adelaide()
+
+
+    first_visit =
+        parse_time(
+            state.get(
+                "first_visit_at"
+            )
+        )
+
+
+    elapsed_text =
+        "unknown"
+
+
+    if first_visit:
+
+        elapsed_seconds =
+            (
+                current_time -
+                first_visit
+            ).total_seconds()
+
+        elapsed_text =
+            format_elapsed(
+                elapsed_seconds
+            )
+
+
+    state["chosen_option"] =
+        choice
+
+
+    state["chosen_at"] =
+        iso_time(
+            current_time
+        )
+
+
+    save_state(state)
+
+
+    # --------------------------------------------------------
+    # CHOICE NOTIFICATION
+    # --------------------------------------------------------
+
+    notification =
+        (
+            "💌 CHAR MESSAGES — CHOICE MADE\n\n"
+            f"Time: {formatted_time(current_time)}\n"
+            f"Message opened: {choice}\n"
+            f"Time since first visit: {elapsed_text}\n"
+            f"Total visits to link: "
+            f"{state.get('visit_count', 0)}\n\n"
+            "She has made her choice."
+        )
+
+
+    send_notification(
+        notification
+    )
 
 
     return jsonify({
 
         "success":
-            False,
+            True,
 
-        "error":
-            "Invalid choice"
+        "message":
+            MESSAGES[choice]
+    })
 
-    }), 400
 
-
-# ==========================================
+# ============================================================
 # RESET
-# ==========================================
+# ============================================================
 
-@app.route('/reset')
+@app.route(
+    "/reset"
+)
 def reset_state():
 
     if os.path.exists(
@@ -3582,11 +2506,11 @@ def reset_state():
     )
 
 
-# ==========================================
-# RUN APP
-# ==========================================
+# ============================================================
+# RUN
+# ============================================================
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     port =
         int(
@@ -3598,11 +2522,6 @@ if __name__ == '__main__':
 
 
     app.run(
-
-        host=
-            "0.0.0.0",
-
-        port=
-            port
-
+        host="0.0.0.0",
+        port=port
     )
