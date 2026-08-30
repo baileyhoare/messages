@@ -7,22 +7,15 @@ app = Flask(__name__)
 
 STATE_FILE = "state.json"
 
-
 # ==========================================
 # NOTIFICATIONS
 # ==========================================
-
 # Set to False when you're ready to send this to the real recipient.
 # While True, no notifications are sent - safe for testing.
 TESTING_MODE = True
 
 # A webhook URL that receives a POST with a JSON body like {"content": "..."}.
 # Easiest free option: https://ntfy.sh
-#
-# Example:
-# NOTIFY_WEBHOOK_URL = "https://ntfy.sh/your-private-topic-name-here"
-#
-# Discord and Slack incoming webhook URLs also work.
 NOTIFY_WEBHOOK_URL = ""
 
 
@@ -38,6 +31,7 @@ def send_notification(message):
                 timeout=5
             )
         else:
+            # Discord/Slack-style webhook
             requests.post(
                 NOTIFY_WEBHOOK_URL,
                 json={
@@ -47,7 +41,6 @@ def send_notification(message):
                 timeout=5
             )
     except Exception:
-        # Never let a failed notification break the site.
         pass
 
 
@@ -57,7 +50,7 @@ def send_notification(message):
 
 SECURITY_QUESTION = "What is this guy's name?"
 
-# Replace with your direct image URL, or leave as "" for text-only.
+# Replace with your direct image URL, or leave as "" for text-only
 SECURITY_IMAGE_URL = "/static/lorentz.jpg"
 
 ACCEPTED_ANSWERS = [
@@ -73,15 +66,33 @@ ACCEPTED_ANSWERS = [
 INTRO_TITLE = "Hey Char"
 
 INTRO_MESSAGE = """
+I made a website. It took a while, but I knew I was going to wait until you had left Canada before sending it to you (which I think has happened). You were always great at making fun websites for me. I had to build a dedicated front- and back-end because there are a couple of tricks which I will explain in a minute.
 
-I made a website. It took a while, but I knew I was going to wait until you had left Canada before sending it to you (which I think has happened). You were always great at making fun websites for me. I had to build a dedicated front- and back-end because there are a couple of tricks which I will explain in a minute. Simply put, I wanted to reach out, with some of my thoughts over the last couple of months. I knew what I wanted to say, but not how to say it, and ended up drafting a couple of versions. I realised that it was because I had no gauge as to how you were doing, and didn't want to upset you or come across in the wrong way, for why I couldn't get the message quite right. So, I built this website, and you can choose. Each message is similar in content, but with a bit of a different tone, and places emphasis on different things. You will choose one message to read, and the other two will be locked away. As far as I know, there is no way to unlock the other two messages once you choose, so be careful.
+Simply put, I wanted to reach out, with some of my thoughts over the last couple of months. I knew what I wanted to say, but not how to say it, and ended up drafting a couple of versions. I realised that it was because I had no gauge as to how you were doing, and didn't want to upset you or come across in the wrong way, for why I couldn't get the message quite right.
+
+So, I built this website, and you can choose.
+
+Each message comes from the same place, but each one takes a slightly different approach:
+
+Message 1 is the most personal. It is mainly about how I feel now — what I miss, what has been difficult, and the things I have wanted to tell you but haven't had the opportunity to say.
+
+Message 2 is more reflective. It is about looking back at what happened between us with a clearer head, understanding my own mistakes, and trying to make sense of why things ended the way they did. It also touches on things I wish I had handled differently and how I think about our future now.
+
+Message 3 is the closure version. It is less about trying to understand or change anything, and more about saying the things I would want you to know if we genuinely never spoke again. It is intended to leave things in a good place, acknowledge what I am sorry for, and wish you well.
+
+There is some overlap between them, because they all come from the same person and the same history. But the emphasis is different.
+
+You will choose one message to read, and the other two will be locked away. As far as I know, there is no way to unlock the other two messages once you choose, so be careful.
 
 I thought about adding some fun easter eggs, but didn't want to overdo it. A nice colour scheme of sage green and sunset orange, along with the security question (well done on passing) should do it.
 
 There is no pressure to reply, but feel free to reach out.
 
-I really don't know how this will go down - it is quite daunting reaching out and being pretty vulnerable on here. All I know is that things ended so quickly, and I wanted to address a couple of things for good. Just to let you know, this website will automatically be taken down 24 hours after you choose to open one of the messages. If you wish to respond, take whatever time you need. Obviously you can copy/paste the messages, and do whatever you like, but it would be nice to keep this between us if possible.
+I really don't know how this will go down - it is quite daunting reaching out and being pretty vulnerable on here. All I know is that things ended so quickly, and I wanted to address a couple of things for good.
 
+Just to let you know, this website will automatically be taken down 24 hours after you choose to open one of the messages. If you wish to respond, take whatever time you need.
+
+Obviously you can copy/paste the messages, and do whatever you like, but it would be nice to keep this between us if possible.
 """
 
 
@@ -96,7 +107,13 @@ That's okay. Here's a bit more context to help:
 
 There isn't really a "right" choice.
 
-The three messages are similar in that they all come from the same place, but they focus on different things. One is more about how I feel now, one is more about what I have come to understand about what happened between us, and one is intended to give some closure.
+The three messages are similar in that they all come from the same place, but they focus on different things.
+
+Message 1 is the most emotionally direct. It is about how I feel now, what I miss, and what I have wanted to say to you.
+
+Message 2 is more about reflection. It looks back at what happened between us, my part in it, what I have come to understand with some distance, and what I regret.
+
+Message 3 is about closure. It is the simplest version of what I would want you to know if we never spoke again — acknowledging what happened, saying what I need to say, and leaving you with my best wishes.
 
 You will only get to read one, so choose whichever feels most appropriate to you.
 
@@ -303,7 +320,7 @@ You knew me better than anyone, and I never had to explain myself around you. Ev
 
 Life is okay. I am getting on with things. Being so very busy does help, but in the quiet times, at the end of the day, or on a Sunday afternoon, everything is quiet, and it's your voice I wish I could hear the most.
 
-I don’t want to make you feel guilty, or responsible for my happiness. You should just understand that losing you hasn’t been easy. You’ll feel as you read this, that this is a stripped back version of how we both used to feel, and its because while it is all true, it is difficult to be so vulnerable with someone I haven’t spoken to in so long. It is so tough carrying around years of memories and feelings regarding someone I no longer even speak to.
+I don’t want to make you feel guilty, or responsible for my happiness. You should just understand that losing you hasn’t been easy. You’ll feel as you read this, that this is a stripped back version of how we both used to feel, and it’s because while it is all true, it is difficult to be so vulnerable with someone I haven’t spoken to in so long. It is so tough carrying around years of memories and feelings regarding someone I no longer even speak to.
 
 I’ve thought a lot about why things ended, and I’ve thought even more about my part in it. I want you to know that I am sorry. I am sorry I wasn’t more supportive of your goals, and your aspirations. I understand that these goals took you further away from me, but that was never why you did it. I was just bitter about the distance, and frustrated by what it meant for us, that I was not able to properly celebrate what it meant for you. You deserved to have somebody that was completely proud of you.
 
@@ -395,6 +412,16 @@ HTML_TEMPLATE = """
         }
 
 
+        * {
+            box-sizing: border-box;
+        }
+
+
+        html {
+            height: 100%;
+        }
+
+
         body {
 
             font-family:
@@ -412,21 +439,13 @@ HTML_TEMPLATE = """
 
             margin: 0;
 
-            display: flex;
-
-            justify-content: center;
-
-            align-items: center;
-
             min-height: 100vh;
-
-            box-sizing: border-box;
 
             background-color: var(--bg-color);
 
             position: relative;
 
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
 
@@ -445,6 +464,8 @@ HTML_TEMPLATE = """
             display: block;
 
             z-index: 0;
+
+            pointer-events: none;
         }
 
 
@@ -464,13 +485,13 @@ HTML_TEMPLATE = """
 
             width: 100%;
 
+            margin: 0 auto;
+
             box-shadow:
                 0 10px 30px rgba(44, 53, 49, 0.06);
 
             border:
                 1px solid rgba(129, 178, 154, 0.2);
-
-            box-sizing: border-box;
         }
 
 
@@ -539,8 +560,6 @@ HTML_TEMPLATE = """
 
             border-radius:
                 calc(var(--border-radius) - 6px);
-
-            box-sizing: border-box;
 
             background-color: #f8fafc;
 
@@ -688,6 +707,15 @@ HTML_TEMPLATE = """
         }
 
 
+        /*
+         * MESSAGE RESULT
+         *
+         * The important change here is that the message
+         * itself gets a fixed maximum height and its own
+         * vertical scrollbar. This means the page does
+         * not become enormous when a long message opens.
+         */
+
         #result {
 
             margin-top: 25px;
@@ -705,10 +733,35 @@ HTML_TEMPLATE = """
 
             word-break: break-word;
 
-            border:
+            border-top:
                 1px solid rgba(129, 178, 154, 0.15);
 
-            border-left-width: 4px;
+            border-right:
+                1px solid rgba(129, 178, 154, 0.15);
+
+            border-bottom:
+                1px solid rgba(129, 178, 154, 0.15);
+
+            /*
+             * Scrollable message area
+             */
+
+            max-height: 60vh;
+
+            overflow-y: auto;
+
+            /*
+             * Makes scrolling feel better on iOS
+             */
+
+            -webkit-overflow-scrolling: touch;
+
+            /*
+             * Prevents the browser from scrolling the
+             * page instead when interacting with the box.
+             */
+
+            overscroll-behavior: contain;
         }
 
 
@@ -723,6 +776,14 @@ HTML_TEMPLATE = """
             margin-top: 8px;
 
             margin-bottom: 0;
+        }
+
+
+        #result strong {
+
+            display: block;
+
+            margin-bottom: 4px;
         }
 
 
@@ -760,8 +821,6 @@ HTML_TEMPLATE = """
             z-index: 1000;
 
             padding: 20px;
-
-            box-sizing: border-box;
         }
 
 
@@ -794,6 +853,8 @@ HTML_TEMPLATE = """
         .modal-header {
 
             padding: 25px 25px 10px 25px;
+
+            flex-shrink: 0;
         }
 
 
@@ -818,6 +879,14 @@ HTML_TEMPLATE = """
             line-height: 1.7;
 
             white-space: pre-wrap;
+
+            -webkit-overflow-scrolling: touch;
+        }
+
+
+        .modal-body p {
+
+            color: var(--text-main);
         }
 
 
@@ -831,6 +900,8 @@ HTML_TEMPLATE = """
             flex-direction: column;
 
             gap: 10px;
+
+            flex-shrink: 0;
         }
 
     </style>
@@ -1264,9 +1335,7 @@ HTML_TEMPLATE = """
             }
 
 
-            let width;
-            let height;
-            let particles;
+            let width, height, particles;
 
 
             const colors = [
@@ -1370,8 +1439,6 @@ HTML_TEMPLATE = """
                     p.y += p.vy;
 
 
-                    // Wrap around edges
-
                     if (p.x < -10)
                         p.x = width + 10;
 
@@ -1384,8 +1451,6 @@ HTML_TEMPLATE = """
                     if (p.y > height + 10)
                         p.y = -10;
 
-
-                    // Mouse interaction
 
                     if (mouse.active) {
 
@@ -1427,8 +1492,6 @@ HTML_TEMPLATE = """
                     }
 
 
-                    // Particle
-
                     ctx.beginPath();
 
                     ctx.arc(
@@ -1448,8 +1511,6 @@ HTML_TEMPLATE = """
 
                 }
 
-
-                // Connecting lines
 
                 ctx.globalAlpha = 1;
 
@@ -1606,8 +1667,8 @@ HTML_TEMPLATE = """
         // ==========================================
 
         let introShown = false;
+
         let pendingChoice = null;
-        let countdownTimer = null;
 
 
         // ==========================================
@@ -1680,8 +1741,7 @@ HTML_TEMPLATE = """
                 );
 
             } catch (e) {
-                // Audio unavailable:
-                // fail silently.
+                // Audio unavailable.
             }
 
         }
@@ -1787,19 +1847,15 @@ HTML_TEMPLATE = """
 
         async function verifyAnswer() {
 
-            const input =
-                document.getElementById(
-                    'answer-input'
-                );
-
-
-            const answer =
-                input.value;
+            let answer =
+                document
+                    .getElementById('answer-input')
+                    .value;
 
 
             try {
 
-                const res =
+                let res =
                     await fetch(
                         '/verify',
                         {
@@ -1818,7 +1874,7 @@ HTML_TEMPLATE = """
                     );
 
 
-                const data =
+                let data =
                     await res.json();
 
 
@@ -1834,10 +1890,9 @@ HTML_TEMPLATE = """
 
                 } else {
 
-                    const err =
-                        document.getElementById(
-                            'error-msg'
-                        );
+                    let err =
+                        document
+                            .getElementById('error-msg');
 
 
                     err
@@ -1845,9 +1900,9 @@ HTML_TEMPLATE = """
                         .remove('hidden');
 
 
-                    input.value = "";
-
-                    input.focus();
+                    document
+                        .getElementById('answer-input')
+                        .value = "";
 
                 }
 
@@ -1881,20 +1936,14 @@ HTML_TEMPLATE = """
 
         function requestChoice(option) {
 
-            // Don't allow another choice while
-            // the confirmation countdown is active.
-            if (pendingChoice !== null) {
-                return;
-            }
-
-
             pendingChoice = option;
 
 
             const yesBtn =
-                document.getElementById(
-                    'confirm-yes-btn'
-                );
+                document
+                    .getElementById(
+                        'confirm-yes-btn'
+                    );
 
 
             yesBtn.disabled = true;
@@ -1906,21 +1955,6 @@ HTML_TEMPLATE = """
                 .remove('hidden');
 
 
-            // Clear any previous countdown.
-
-            if (countdownTimer !== null) {
-
-                clearInterval(
-                    countdownTimer
-                );
-
-                countdownTimer = null;
-
-            }
-
-
-            // Five-second countdown.
-
             let secondsLeft = 5;
 
 
@@ -1928,7 +1962,7 @@ HTML_TEMPLATE = """
                 `Yes, I'm sure (${secondsLeft})`;
 
 
-            countdownTimer =
+            const countdown =
                 setInterval(
                     () => {
 
@@ -1943,10 +1977,8 @@ HTML_TEMPLATE = """
                         } else {
 
                             clearInterval(
-                                countdownTimer
+                                countdown
                             );
-
-                            countdownTimer = null;
 
 
                             yesBtn.innerText =
@@ -1970,28 +2002,12 @@ HTML_TEMPLATE = """
             pendingChoice = null;
 
 
-            if (countdownTimer !== null) {
-
-                clearInterval(
-                    countdownTimer
-                );
-
-                countdownTimer = null;
-
-            }
-
-
-            const yesBtn =
-                document.getElementById(
+            document
+                .getElementById(
                     'confirm-yes-btn'
-                );
-
-
-            yesBtn.innerText =
+                )
+                .innerText =
                 "Yes, I'm sure";
-
-
-            yesBtn.disabled = true;
 
 
             document
@@ -2010,24 +2026,12 @@ HTML_TEMPLATE = """
 
         async function confirmChoice() {
 
-            if (!pendingChoice) {
+            if (!pendingChoice)
                 return;
-            }
 
 
             const option =
                 pendingChoice;
-
-
-            if (countdownTimer !== null) {
-
-                clearInterval(
-                    countdownTimer
-                );
-
-                countdownTimer = null;
-
-            }
 
 
             document
@@ -2038,7 +2042,7 @@ HTML_TEMPLATE = """
 
             try {
 
-                const res =
+                let res =
                     await fetch(
                         '/choose',
                         {
@@ -2057,7 +2061,7 @@ HTML_TEMPLATE = """
                     );
 
 
-                const data =
+                let data =
                     await res.json();
 
 
@@ -2077,8 +2081,6 @@ HTML_TEMPLATE = """
                 }
 
             } catch (e) {
-
-                console.error(e);
 
                 alert(
                     "Network error. Please try again."
@@ -2100,8 +2102,6 @@ HTML_TEMPLATE = """
 
         function applyLock(chosen, msg) {
 
-            // Hide "I can't choose"
-
             document
                 .getElementById(
                     'indecision-btn'
@@ -2109,8 +2109,6 @@ HTML_TEMPLATE = """
                 .classList
                 .add('hidden');
 
-
-            // Lock all envelopes
 
             document
                 .querySelectorAll(
@@ -2138,9 +2136,7 @@ HTML_TEMPLATE = """
                             );
 
 
-                        // ==================================
                         // CHOSEN MESSAGE
-                        // ==================================
 
                         if (
                             num.toString() === chosen
@@ -2153,8 +2149,6 @@ HTML_TEMPLATE = """
                             label.textContent =
                                 `Message ${chosen} (Opened)`;
 
-
-                            // Open envelope
 
                             icon.innerHTML = `
 
@@ -2192,9 +2186,7 @@ HTML_TEMPLATE = """
                             `;
 
 
-                        // ==================================
                         // LOCKED MESSAGES
-                        // ==================================
 
                         } else {
 
@@ -2239,8 +2231,6 @@ HTML_TEMPLATE = """
                 );
 
 
-            // Update status
-
             document
                 .getElementById('status')
                 .innerText =
@@ -2251,7 +2241,7 @@ HTML_TEMPLATE = """
             // DISPLAY MESSAGE
             // ==========================================
 
-            const resBox =
+            let resBox =
                 document.getElementById(
                     'result'
                 );
@@ -2262,12 +2252,8 @@ HTML_TEMPLATE = """
             );
 
 
-            // Clear existing content
-
             resBox.innerHTML = "";
 
-
-            // Message heading
 
             const heading =
                 document.createElement(
@@ -2282,8 +2268,6 @@ HTML_TEMPLATE = """
             heading.textContent =
                 "Message " + chosen + ":";
 
-
-            // Message body
 
             const message =
                 document.createElement(
@@ -2307,8 +2291,6 @@ HTML_TEMPLATE = """
                 msg;
 
 
-            // Put them into result box
-
             resBox.appendChild(
                 heading
             );
@@ -2316,6 +2298,11 @@ HTML_TEMPLATE = """
             resBox.appendChild(
                 message
             );
+
+
+            // Start at the top of the message
+
+            resBox.scrollTop = 0;
 
         }
 
@@ -2328,18 +2315,18 @@ HTML_TEMPLATE = """
 
             try {
 
-                const res =
+                let res =
                     await fetch(
                         '/status?' +
                         new Date().getTime()
                     );
 
 
-                const data =
+                let data =
                     await res.json();
 
 
-                // A choice has already been made.
+                // A choice has already been made
 
                 if (data.chosen_option) {
 
@@ -2389,7 +2376,7 @@ HTML_TEMPLATE = """
                     );
 
 
-                // Authenticated but hasn't chosen.
+                // Authenticated but hasn't chosen
 
                 } else if (
                     data.authenticated
@@ -2416,12 +2403,12 @@ HTML_TEMPLATE = """
         }
 
 
-        // Initial state check.
+        // Initial state check
 
         checkState();
 
 
-        // Continue checking state every 3 seconds.
+        // Continue checking state every 3 seconds
 
         setInterval(
             checkState,
@@ -2449,11 +2436,17 @@ def home():
 
     return render_template_string(
         HTML_TEMPLATE,
+
         question=SECURITY_QUESTION,
+
         image_url=SECURITY_IMAGE_URL,
+
         intro_title=INTRO_TITLE,
+
         intro_message=INTRO_MESSAGE,
+
         indecision_title=INDECISION_TITLE,
+
         indecision_message=INDECISION_MESSAGE
     )
 
@@ -2475,33 +2468,43 @@ def status():
     if chosen:
 
         return jsonify({
-            "chosen_option": chosen,
-            "message": MESSAGES[chosen],
-            "authenticated": True
+
+            "chosen_option":
+                chosen,
+
+            "message":
+                MESSAGES[chosen],
+
+            "authenticated":
+                True
+
         })
 
     return jsonify({
-        "chosen_option": None,
-        "authenticated": authenticated
+
+        "chosen_option":
+            None,
+
+        "authenticated":
+            authenticated
+
     })
 
 
 @app.route('/verify', methods=['POST'])
 def verify():
 
-    req_data = request.get_json(
-        silent=True
-    ) or {}
+    req_data = request.get_json()
+
+    if not req_data:
+        req_data = {}
+
 
     user_answer = req_data.get(
         "answer",
         ""
-    )
+    ).strip().lower()
 
-    if not isinstance(user_answer, str):
-        user_answer = str(user_answer)
-
-    user_answer = user_answer.strip().lower()
 
     if user_answer in [
         answer.lower()
@@ -2518,6 +2521,7 @@ def verify():
             "success": True
         })
 
+
     return jsonify({
         "success": False
     }), 400
@@ -2528,7 +2532,8 @@ def choose():
 
     state = get_state()
 
-    # Must authenticate first.
+
+    # Must authenticate first
 
     if not state.get(
         "authenticated",
@@ -2536,38 +2541,45 @@ def choose():
     ):
 
         return jsonify({
+
             "success": False,
-            "error": "Not authenticated!"
+
+            "error":
+                "Not authenticated!"
+
         }), 403
 
 
-    # Choice already made.
+    # Choice already made
 
     if state.get(
         "chosen_option"
     ) is not None:
 
         return jsonify({
+
             "success": False,
+
             "error":
                 "A choice has already been made and locked!"
+
         }), 400
 
 
-    req_data = request.get_json(
-        silent=True
-    ) or {}
+    req_data = request.get_json()
+
+    if not req_data:
+        req_data = {}
 
 
     choice = str(
         req_data.get(
-            "choice",
-            ""
+            "choice"
         )
     )
 
 
-    # Valid choice.
+    # Valid choice
 
     if choice in MESSAGES:
 
@@ -2575,19 +2587,31 @@ def choose():
 
         save_state(state)
 
+
         send_notification(
             f"💌 A choice has been made: Message {choice} was opened."
         )
 
+
         return jsonify({
-            "success": True,
-            "message": MESSAGES[choice]
+
+            "success":
+                True,
+
+            "message":
+                MESSAGES[choice]
+
         })
 
 
     return jsonify({
-        "success": False,
-        "error": "Invalid choice"
+
+        "success":
+            False,
+
+        "error":
+            "Invalid choice"
+
     }), 400
 
 
@@ -2601,6 +2625,7 @@ def reset_state():
         os.remove(
             STATE_FILE
         )
+
 
     return "State has been reset!"
 
@@ -2617,6 +2642,7 @@ if __name__ == '__main__':
             5000
         )
     )
+
 
     app.run(
         host="0.0.0.0",
